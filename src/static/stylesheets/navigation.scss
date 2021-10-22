@@ -1,0 +1,32 @@
+.navigation {
+  background: $darkergray;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  user-select: none;
+  width: 150px;
+
+  &__link {
+    align-items: center;
+    color: $white;
+    cursor: pointer;
+    display: flex;
+    height: 40px;
+    padding: 0 20px;
+
+    &.active {
+      background-color: $darkgray;
+    }
+  }
+
+  &__logo-container {
+    padding: 10px 20px 30px;
+  }
+
+  &__logo {
+    * {
+      fill: $white;
+      stroke: $white;
+    }
+  }
+}

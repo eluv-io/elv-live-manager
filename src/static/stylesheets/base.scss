@@ -1,0 +1,67 @@
+// sass-lint:disable no-vendor-prefixes, no-color-literals, force-pseudo-nesting
+
+* {
+  -webkit-overflow-scrolling: touch;
+
+  ::-webkit-scrollbar {
+    opacity: 1;
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #333;
+    opacity: 1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #777;
+    opacity: 1;
+  }
+}
+
+body {
+  color: $black;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+
+  * {
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+  }
+}
+
+a,
+button,
+input {
+  &:focus {
+    outline: 0;
+  }
+
+  &:focus-visible {
+    outline: 1px solid $blue;
+  }
+}
+
+html,
+body,
+.app,
+.app-container,
+.page-container {
+  background-color: $white;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  max-width: 100%;
+  min-height: 100%;
+  overscroll-behavior-y: none; // sass-lint:disable-line no-misspelled-properties
+  width: 100%;
+}
+
+.current-path {
+  background: $black;
+  color: $white;
+  font-weight: 300;
+  padding: 10px 20px;
+}
+
+.app-container {
+  flex-direction: row;
+}
