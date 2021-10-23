@@ -3,7 +3,7 @@ import {Redirect, withRouter} from "react-router-dom";
 
 const ErrorBoundary = withRouter(({location, match, redirectOnError, To, hideOnError, children, className=""}) => {
   const [oldLocation, setOldLocation] = useState(location);
-  const [error, setError] = useState(error);
+  const [error, setError] = useState(undefined);
 
   useEffect(() => {
     if(oldLocation.pathname !== location.pathname) {

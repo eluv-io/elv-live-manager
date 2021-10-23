@@ -99,32 +99,12 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        loader: 'buble-loader',
-        include: Path.join(__dirname, 'src'),
+        loader: "esbuild-loader",
         options: {
-          objectAssign: 'Object.assign'
+          loader: "jsx",  // Remove this if you're not using JSX
+          target: "es2015"  // Syntax to compile to (see options below for possible values)
         }
       },
-      /*
-      {
-        test: /\.(js|mjs)$/,
-        exclude: /node_modules\/(?!elv-components-js)/,
-        loader: "babel-loader",
-        options: {
-          presets: [
-            "@babel/preset-env",
-            "@babel/preset-react",
-            "babel-preset-mobx"
-          ],
-          plugins: [
-            require("@babel/plugin-proposal-object-rest-spread"),
-            require("@babel/plugin-transform-regenerator"),
-            require("@babel/plugin-transform-runtime")
-          ]
-        }
-      },
-
-       */
       {
         test: /\.svg$/,
         loader: "svg-inline-loader"
