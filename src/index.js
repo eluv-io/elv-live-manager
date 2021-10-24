@@ -2,15 +2,14 @@ import "Assets/stylesheets/app.scss";
 
 import React from "react";
 import { render } from "react-dom";
-import { observer} from "mobx-react";
-
-import { rootStore } from "Stores/index.js";
+import { observer} from "mobx-preact";
 
 import {
   HashRouter,
   Switch,
   Route,
-  Redirect, withRouter
+  Redirect,
+  withRouter
 } from "react-router-dom";
 import ScrollToTop from "Components/common/ScrollToTop";
 import {ErrorBoundary} from "Components/common/ErrorBoundary";
@@ -70,7 +69,6 @@ const App = observer(() => {
     </HashRouter>
   );
 });
-
 
 render(
   <React.StrictMode>

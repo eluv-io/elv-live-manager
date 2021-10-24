@@ -1,6 +1,6 @@
 import React from "react";
 import {NavLink, Redirect, Route, Switch, useRouteMatch} from "react-router-dom";
-import {observer} from "mobx-react";
+import {observer} from "mobx-preact";
 import EventNavigation from "Components/events/Navigation";
 import { contentStore } from "Stores";
 import UrlJoin from "url-join";
