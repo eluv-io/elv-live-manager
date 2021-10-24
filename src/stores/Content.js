@@ -1,17 +1,42 @@
 import {flow, computed, makeAutoObservable} from "mobx";
+import Utils from "@eluvio/elv-client-js/src/Utils";
 
 class ContentStore {
   tenantObjectId = undefined;
   tenant = undefined;
-  events = {};
-  marketplaces = {};
 
   get client() {
     return this.rootStore.client;
   }
 
+  get events() {
+    return Object.keys(Utils.SafeTraverse(this.tenant, "sites") || {}).map(eventSlug => {
+      const event = this.tenant.sites[eventSlug];
+
+      if(!event || !event["."]) {
+        return;
+      }
+
+      return {
+        objectId: Utils.DecodeVersionHash(event["."].source).objectId,
+        versionHash: event["."].source,
+        slug: eventSlug,
+        name: event.display_title
+      }
+    }).filter(event => event);
+  }
+
+  Event(objectId) {
+    return this.events.find(event => event.objectId === objectId);
+  }
+
   constructor(rootStore) {
-    makeAutoObservable(this, { client: computed });
+    makeAutoObservable(this,
+      {
+        client: computed,
+        events: computed
+      }
+    );
 
     this.rootStore = rootStore;
   }
@@ -23,7 +48,7 @@ class ContentStore {
   });
 
   LoadTenant = flow(function * () {
-    const tenantInfo = yield this.client.ContentObjectMetadata({
+    this.tenant = yield this.client.ContentObjectMetadata({
       libraryId: yield this.client.ContentObjectLibraryId({objectId: this.tenantObjectId}),
       objectId: this.tenantObjectId,
       metadataSubtree: "public/asset_metadata",

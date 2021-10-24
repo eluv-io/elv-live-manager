@@ -15,6 +15,7 @@ import {
 import ScrollToTop from "Components/common/ScrollToTop";
 import {ErrorBoundary} from "Components/common/ErrorBoundary";
 import TopNavigation from "./components/navigation/TopNavigation";
+import Events from "Components/events";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -28,7 +29,7 @@ const Routes = () => {
         <Placeholder text="Tenant" />
       </Route>
       <Route path="/events">
-        <Placeholder text="Events" />
+        <Events />
       </Route>
       <Route path="/marketplaces">
         <Placeholder text="Marketplaces" />
@@ -47,8 +48,6 @@ const Routes = () => {
 };
 
 const CurrentPath = withRouter(({location}) => {
-  console.log(location);
-
   return (
     <div className="current-path">
       { location.pathname }

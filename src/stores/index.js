@@ -15,6 +15,8 @@ class RootStore {
   constructor() {
     makeAutoObservable(this);
 
+    this.contentStore = new ContentStore(this);
+
     this.Initialize();
   }
 
@@ -22,8 +24,6 @@ class RootStore {
     this.client = new FrameClient({target: window.parent, timeout: 60});
     this.address = yield this.client.CurrentAccountAddress();
     this.networkInfo = yield this.client.NetworkInfo();
-
-    this.contentStore = new ContentStore(this);
 
     yield this.contentStore.Initialize();
   });

@@ -14,8 +14,12 @@
     height: 40px;
     padding: 0 20px;
 
+    &-back {
+      background-color: $darkergray;
+    }
+
     &.active {
-      background-color: $darkgray;
+      background-color: $blue;
     }
   }
 
@@ -27,6 +31,29 @@
     * {
       fill: $white;
       stroke: $white;
+    }
+  }
+
+  &-sub {
+    background: $darkgray;
+    border-left: 1px solid $darkergray;
+  }
+}
+
+.navigation-list {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  user-select: none;
+  width: 100%;
+
+  &__link {
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    padding: 20px;
+
+    &:hover {
+      border-left: 3px solid lighten($blue, 20%);
     }
   }
 }

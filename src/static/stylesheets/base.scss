@@ -44,7 +44,8 @@ html,
 body,
 .app,
 .app-container,
-.page-container {
+.page-container,
+.page-content {
   background-color: $white;
   display: flex;
   flex: 1 1 auto;
@@ -64,4 +65,41 @@ body,
 
 .app-container {
   flex-direction: row;
+}
+
+.page-container-nav {
+  flex-direction: row;
+}
+
+.page-content {
+  padding: 20px 40px;
+}
+
+.page-header {
+  font-size: 26px;
+  font-weight: 300;
+  margin-bottom: 20px;
+}
+
+.actions-container {
+  align-items: center;
+  display: flex;
+  padding: 20px 0;
+  width: 100%;
+
+  .action {
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 10px 20px;
+    user-select: none;
+
+    &-primary {
+      background-color: $blue;
+      color: $white;
+
+      &:hover {
+        background-color: lighten($blue, 5%);
+      }
+    }
+  }
 }
