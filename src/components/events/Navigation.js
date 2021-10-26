@@ -5,8 +5,6 @@ import {NavLink, useRouteMatch} from "react-router-dom";
 const EventNavigation = () => {
   const match = useRouteMatch();
 
-  console.log(match);
-
   if(!match.params.eventId) {
     return null;
   }

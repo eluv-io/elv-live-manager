@@ -1,0 +1,27 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &__item {
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    height: 50px;
+    padding: 15px 20px;
+
+    &:not(.list__header) {
+      &:not(:disabled) {
+        &:hover {
+          border-left: 3px solid $blue;
+        }
+      }
+    }
+
+    & > * {
+      &:not(.no-ellipsis) {
+        @include ellipsis;
+        padding-right: 20px;
+      }
+    }
+  }
+}

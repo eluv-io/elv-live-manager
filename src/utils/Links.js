@@ -1,4 +1,12 @@
 import Utils from "@eluvio/elv-client-js/src/Utils";
+import UrlJoin from "url-join";
+
+export const SetUrlPath = (baseUrl, path) => {
+  const url = new URL(baseUrl);
+  url.pathname = UrlJoin(url.pathname, path);
+
+  return url.toString();
+} ;
 
 export const LinkComponents = (link, baseHash) => {
   try {

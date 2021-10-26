@@ -1,0 +1,163 @@
+.file-browser {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  max-width: 1000px;
+  min-height: 500px;
+  overflow-y: hidden;
+  padding: 20px 40px 40px;
+  width: 90vw;
+
+  &__header {
+    align-items: center;
+    display: flex;
+
+    h1 {
+      font-size: 24px;
+      width: 100%;
+    }
+
+    .actions-container {
+      justify-content: right;
+    }
+  }
+
+  &__actions {
+    justify-content: space-between;
+    padding: 10px 0;
+  }
+
+  &__path-container {
+    align-items: center;
+    border-top: 2px solid $lightgray;
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0 0;
+    width: 100%;
+  }
+
+  &__path {
+    align-items: center;
+    border-radius: 3px;
+    color: $black;
+    display: flex;
+    font-size: 16px;
+    height: 80px;
+    padding: 15px 10px;
+
+    &__slash {
+      align-items: center;
+      display: flex;
+      font-size: 24px;
+      font-weight: 300;
+      height: 100%;
+      margin: 0 10px;
+    }
+
+    &__element {
+      color: $blue;
+      cursor: pointer;
+      height: 40px;
+      letter-spacing: 1px;
+      padding: 10px;
+      text-decoration: underline;
+
+      &:first-child {
+        padding-left: 0;
+      }
+    }
+  }
+
+  &__upload-status {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__upload-status-percent {
+    color: $blue;
+    font-weight: 500;
+    margin-right: 15px;
+  }
+
+  &__list {
+    flex: 1 1 100%;
+    overflow-y: scroll;
+    position: relative;
+  }
+
+  &__file-header {
+    background-color: $white;
+    border-bottom: 1px solid $lightgray;
+    left: 0;
+    opacity: 1;
+    position: sticky;
+    top: 0;
+    user-select: none;
+    width: 100%;
+    z-index: 1;
+
+    &__column {
+      width: min-content;
+
+      &:hover {
+        font-weight: bold;
+      }
+    }
+  }
+
+  &__file {
+    display: grid;
+    grid-template-columns: 40px 4fr 1fr 1fr;
+    max-height: 50px;
+    min-height: 50px;
+    padding: 12px 5px;
+
+    &:nth-child(even) {
+      background-color: $lightestgray;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &__column {
+      align-items: center;
+      display: flex;
+    }
+
+    &__column-icon {
+      justify-content: center;
+      padding: 0;
+    }
+
+    &__icon {
+      height: 20px;
+      stroke: $darkgray;
+
+      width: 20px;
+    }
+  }
+}
+
+.directory-modal {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 500px;
+  padding: 30px;
+
+  .actions-container {
+    justify-content: center;
+    padding: 15px;
+
+    .action {
+      width: 145px;
+    }
+  }
+}

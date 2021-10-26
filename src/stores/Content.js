@@ -88,7 +88,7 @@ class ContentStore {
   }
 
   LiveTenantObjectId = flow(function * () {
-    const lsKey = `${this.address}-tenantObjectId`;
+    const lsKey = `${this.rootStore.networkInfo.name}-${this.rootStore.address}-tenantObjectId`;
     if(localStorage.getItem(lsKey)) {
       return localStorage.getItem(lsKey);
     }

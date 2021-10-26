@@ -67,6 +67,7 @@ module.exports = {
       Assets: Path.resolve(__dirname, "src/static"),
       Components: Path.resolve(__dirname, "src/components"),
       Stores: Path.resolve(__dirname, "src/stores"),
+      Utils: Path.resolve(__dirname, "src/utils"),
       // Force webpack to use *one* copy of bn.js instead of 8
       "bn.js": Path.resolve(Path.join(__dirname, "node_modules", "bn.js")),
       "react": "preact/compat",

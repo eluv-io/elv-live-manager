@@ -1,6 +1,7 @@
 import {FrameClient} from "@eluvio/elv-client-js/src/FrameClient";
 import {configure, flow, makeAutoObservable} from "mobx";
 import ContentStore from "Stores/Content";
+import EditStore from "Stores/Edit";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -16,6 +17,7 @@ class RootStore {
     makeAutoObservable(this);
 
     this.contentStore = new ContentStore(this);
+    this.editStore = new EditStore(this);
 
     this.Initialize();
   }
@@ -31,5 +33,6 @@ class RootStore {
 
 export const rootStore = new RootStore();
 export const contentStore = rootStore.contentStore;
+export const editStore = rootStore.editStore;
 
 window.rootStore = rootStore;

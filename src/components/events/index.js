@@ -4,6 +4,9 @@ import {observer} from "mobx-preact";
 import EventNavigation from "Components/events/Navigation";
 import { contentStore } from "Stores";
 import UrlJoin from "url-join";
+import Modal from "Components/common/Modal";
+import FileBrowser from "Components/common/FileBrowser";
+import {PageLoader} from "Components/common/Loader";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -13,10 +16,10 @@ const EventList = observer(() => {
       <div className="actions-container">
         <button className="action action-primary">Create Event</button>
       </div>
-      <div className="navigation-list events__list">
+      <div className="navigation-list list events__list">
         {
-          [...contentStore.events, ...contentStore.events].map(event =>
-            <NavLink to={UrlJoin("/events", event.objectId)} key={`event-${event.objectId}`} className="navigation-list__link">
+          contentStore.events.map(event =>
+            <NavLink to={UrlJoin("/events", event.objectId)} key={`event-${event.objectId}`} className="navigation-list__link list__item">
               { event.name || event.slug }
             </NavLink>
           )
@@ -26,20 +29,36 @@ const EventList = observer(() => {
   );
 });
 
-const EventPage = ({children}) => {
+const Event = observer(() => {
   const match = useRouteMatch();
   const event = match.params.eventId && contentStore.Event(match.params.eventId);
+
+  return (
+    <div className="events">
+      <h2>Event</h2>
+      <FileBrowser objectId={event.objectId} Close={console.log} Select={console.log} />
+    </div>
+  );
+});
+
+const EventPage = observer(({children}) => {
+  const match = useRouteMatch();
+  const event = match.params.eventId && contentStore.Event(match.params.eventId);
+
+  if(match.params.eventId && !event) {
+    return <PageLoader />;
+  }
 
   return (
     <div className="page-container page-container-nav">
       <EventNavigation />
       <div className="page-content">
-        <h1 className="page-header">{ event ? event.name : "Events" }</h1>
-        { children }
+        <h1 className="page-header">{event ? event.name : "Events"}</h1>
+        {children}
       </div>
     </div>
   );
-};
+});
 
 const Events = () => {
   return (
@@ -51,7 +70,7 @@ const Events = () => {
       </Route>
       <Route exact path="/events/:eventId">
         <EventPage>
-          <Placeholder text="event" />
+          <Event />
         </EventPage>
       </Route>
       <Route path="/events/:eventId/marketplace">

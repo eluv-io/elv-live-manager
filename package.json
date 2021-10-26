@@ -25,6 +25,7 @@
     "mobx-preact": "^3.0.0",
     "mobx-react": "^7.2.1",
     "preact": "^10.5.15",
+    "pretty-bytes": "^5.6.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-inlinesvg": "^2.3.0",
