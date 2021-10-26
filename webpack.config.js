@@ -27,12 +27,13 @@ if(process.env.ANALYZE_BUNDLE) {
 }
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: {
+    index: "./src/index.js"
+  },
   target: "web",
   output: {
     path: Path.resolve(__dirname, "dist"),
-    filename: "index.js",
-    chunkFilename: "[name].[contenthash].bundle.js"
+    filename: pathData => pathData.chunk.name === "index" ? "index.js" : "[name].[contenthash].js"
   },
   devServer: {
     allowedHosts: "all",
@@ -43,8 +44,8 @@ module.exports = {
       "Access-Control-Allow-Methods": "POST"
     }
   },
-  /*
   optimization: {
+    /*
     minimizer: [
       new TerserPlugin({
         terserOptions: {
@@ -53,12 +54,12 @@ module.exports = {
         }
       })
     ],
+
+     */
     splitChunks: {
       chunks: "all"
     }
   },
-
-   */
   mode: "development",
   devtool: "eval-source-map",
   plugins,
