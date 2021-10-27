@@ -1,16 +1,34 @@
+// sass-lint:disable function-name-format
+
+.file-browser-modal {
+  width: 100%;
+
+  .modal__content {
+    max-width: MIN(90vw, 1000px);
+    width: 100%;
+  }
+
+  .file-browser {
+    height: 100vh;
+    max-width: 1000px;
+    padding: 20px 40px 40px;
+    width: MIN(100vw, 100%);
+  }
+}
+
 .file-browser {
   display: flex;
+  flex: 1 1 100%;
   flex-direction: column;
-  height: 90vh;
-  max-width: 1000px;
+  height: 100%;
+  max-height: 100%;
   min-height: 500px;
-  overflow-y: hidden;
-  padding: 20px 40px 40px;
-  width: 90vw;
+  width: 100%;
 
   &__header {
     align-items: center;
     display: flex;
+    margin: 20px 0;
 
     h1 {
       font-size: 24px;
@@ -18,7 +36,7 @@
     }
 
     .actions-container {
-      justify-content: right;
+      justify-content: flex-end;
     }
   }
 
@@ -42,7 +60,7 @@
     color: $black;
     display: flex;
     font-size: 16px;
-    height: 80px;
+    height: 60px;
     padding: 15px 10px;
 
     &__slash {
@@ -108,7 +126,7 @@
 
   &__file {
     display: grid;
-    grid-template-columns: 40px 4fr 1fr 1fr;
+    grid-template-columns: 40px 4fr 1fr 1fr 40px;
     max-height: 50px;
     min-height: 50px;
     padding: 12px 5px;
@@ -121,8 +139,21 @@
       opacity: 0.4;
     }
 
+    &:focus,
     &:hover {
       opacity: 1;
+
+      .file-browser__file__column-actions {
+        opacity: 1;
+      }
+    }
+
+    svg {
+      &:hover {
+        * {
+          stroke: $blue;
+        }
+      }
     }
 
     &__column {
@@ -133,6 +164,26 @@
     &__column-icon {
       justify-content: center;
       padding: 0;
+    }
+
+    .action-icon {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      justify-content: center;
+      width: 100%;
+
+      svg {
+        height: 20px;
+        width: 20px;
+      }
+    }
+
+    &__column-actions {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      opacity: 0;
     }
 
     &__icon {

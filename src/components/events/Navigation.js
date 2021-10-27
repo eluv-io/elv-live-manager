@@ -18,6 +18,7 @@ const EventNavigation = () => {
       <NavLink className="navigation__link" to={UrlJoin(basePath, "marketplace")}>Marketplace</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "nfts")}>NFTs</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "media")}>Media</NavLink>
+      <NavLink className="navigation__link" to={UrlJoin(basePath, "files")}>Files</NavLink>
     </div>
   );
 };

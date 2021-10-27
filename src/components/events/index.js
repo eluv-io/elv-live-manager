@@ -5,8 +5,10 @@ import EventNavigation from "Components/events/Navigation";
 import { contentStore } from "Stores";
 import UrlJoin from "url-join";
 import Modal from "Components/common/Modal";
-import FileBrowser from "Components/common/FileBrowser";
+import FileBrowser, {FileBrowserModal} from "Components/common/FileBrowser";
 import {PageLoader} from "Components/common/Loader";
+import {ErrorBoundary} from "Components/common/ErrorBoundary";
+import {ContentBrowserModal} from "Components/ContentBrowser";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -33,15 +35,16 @@ const Event = observer(() => {
   const match = useRouteMatch();
   const event = match.params.eventId && contentStore.Event(match.params.eventId);
 
+  // <FileBrowserModal objectId={event.objectId} Close={console.log} Select={console.log} />
   return (
-    <div className="events">
+    <div className="page-content events">
       <h2>Event</h2>
-      <FileBrowser objectId={event.objectId} Close={console.log} Select={console.log} />
+      <ContentBrowserModal Close={console.log} Select={console.log} requireVersion />
     </div>
   );
 });
 
-const EventPage = observer(({children}) => {
+const EventPage = observer(({children, Render}) => {
   const match = useRouteMatch();
   const event = match.params.eventId && contentStore.Event(match.params.eventId);
 
@@ -50,13 +53,15 @@ const EventPage = observer(({children}) => {
   }
 
   return (
-    <div className="page-container page-container-nav">
-      <EventNavigation />
-      <div className="page-content">
-        <h1 className="page-header">{event ? event.name : "Events"}</h1>
-        {children}
+    <ErrorBoundary>
+      <div className="page-container page-container-nav">
+        <EventNavigation />
+        <div className="page-content">
+          <h1 className="page-header">{event ? event.name : "Events"}</h1>
+          { Render ? Render() : children }
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 });
 
@@ -70,12 +75,12 @@ const Events = () => {
       </Route>
       <Route exact path="/events/:eventId">
         <EventPage>
-          <Event />
+          <Placeholder text="Event" />
         </EventPage>
       </Route>
       <Route path="/events/:eventId/marketplace">
         <EventPage>
-          <Placeholder text="Marketplace" />
+          <Event />
         </EventPage>
       </Route>
       <Route path="/events/:eventId/nfts">
@@ -87,6 +92,15 @@ const Events = () => {
         <EventPage>
           <Placeholder text="Media" />
         </EventPage>
+      </Route>
+      <Route path="/events/:eventId/files">
+        <EventPage
+          Render={() => {
+            const match = useRouteMatch();
+
+            return <FileBrowser header="Files" objectId={match.params.eventId} />;
+          }}
+        />
       </Route>
       <Route path="*">
         <Redirect to="/" />

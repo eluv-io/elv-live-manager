@@ -6,7 +6,7 @@
   &__item {
     border-left: 3px solid transparent;
     cursor: pointer;
-    height: 50px;
+    min-height: 50px;
     padding: 15px 20px;
 
     &:not(.list__header) {

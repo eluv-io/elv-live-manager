@@ -57,7 +57,6 @@ const CurrentPath = withRouter(({location}) => {
 const App = observer(() => {
   return (
     <HashRouter>
-      <CurrentPath />
       <div className="app-container">
         <TopNavigation />
         <ScrollToTop>

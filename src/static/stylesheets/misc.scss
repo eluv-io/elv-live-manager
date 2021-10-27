@@ -18,3 +18,24 @@
     overflow: hidden;
   }
 }
+
+.confirm {
+  max-width: 600px;
+  padding: 40px 40px 20px;
+  width: 100%;
+
+  &__message {
+    font-size: 20px;
+    font-weight: 300;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .actions-container {
+    justify-content: center;
+  }
+
+  .action {
+    min-width: 150px;
+  }
+}

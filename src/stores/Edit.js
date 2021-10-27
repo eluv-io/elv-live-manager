@@ -82,6 +82,18 @@ class EditStore {
     return this.files[objectId];
   });
 
+  DeleteFile = flow(function * ({objectId, path}) {
+    const libraryId = yield this.client.ContentObjectLibraryId({objectId});
+    yield this.client.DeleteFiles({
+      libraryId,
+      objectId,
+      writeToken: yield this.WriteToken({objectId}),
+      filePaths: [ path ]
+    })
+
+    yield this.Files({objectId, force: true});
+  });
+
   WriteToken = flow (function * ({objectId}) {
     if(!this.writeTokens[objectId]) {
       const { writeToken } = yield this.client.EditContentObject({

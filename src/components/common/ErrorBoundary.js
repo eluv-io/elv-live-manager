@@ -32,6 +32,7 @@ const ErrorBoundary = withRouter(({location, match, redirectOnError, To, hideOnE
 
     return children;
   } catch(error) {
+    console.error(error);
     setError(error);
 
     return null;
