@@ -28,7 +28,7 @@
   &__header {
     align-items: center;
     display: flex;
-    margin: 5px 0 15px;
+    margin: 15px 0;
 
     h1 {
       font-size: 24px;
@@ -67,7 +67,7 @@
 
   &__lookup {
     display: flex;
-    height: 40px;
+    height: 35px;
     min-width: 300px;
     padding: 0;
     width: 300px;
@@ -91,9 +91,9 @@
     cursor: pointer;
     height: 100%;
     margin-left: 5px;
-    min-width: 40px;
-    padding: 10px;
-    width: 40px;
+    min-width: 35px;
+    padding: 8px;
+    width: 35px;
   }
 
   &__lookup-button-icon {

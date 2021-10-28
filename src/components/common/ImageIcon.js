@@ -1,7 +1,7 @@
 import React from "react";
 import SVG from "react-inlinesvg";
 
-const ImageIcon = ({icon, alternateIcon, label, useLoadingIndicator=false, className, ...props}) => {
+const ImageIcon = ({icon, alternateIcon, label, useLoadingIndicator=false, className="", ...props}) => {
   const [error, setError] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
 
@@ -31,5 +31,29 @@ const ImageIcon = ({icon, alternateIcon, label, useLoadingIndicator=false, class
     );
   }
 };
+
+export const IconButton = ({icon, alternateIcon, label, title, onClick, disabled=false, hidden=false, className="", ...props}) => {
+  if(hidden) { return null; }
+
+  return (
+    <button
+      {...props}
+      type="button"
+      role="button"
+      aria-label={label}
+      title={title || label}
+      onClick={onClick}
+      disabled={disabled}
+      className={`action action-icon ${className}`}
+    >
+      <ImageIcon
+        icon={icon}
+        alternateIcon={alternateIcon}
+        className="action-icon__icon"
+      />
+    </button>
+  );
+};
+
 
 export default ImageIcon;

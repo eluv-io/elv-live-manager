@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import UrlJoin from "url-join";
-import {editStore} from "Stores";
+import {filesStore} from "Stores";
 import {observer} from "mobx-preact";
 import AsyncComponent from "Components/common/AsyncComponent";
 import PrettyBytes from "pretty-bytes";
@@ -10,6 +10,7 @@ import ImageIcon from "Components/common/ImageIcon";
 import {FileInfo, imageTypes} from "Utils/Files";
 import ImagePreview from "Components/common/ImagePreview";
 import {onEnterPressed} from "Utils/Misc";
+import Confirm from "Components/common/Confirm";
 
 import FileIcon from "Assets/icons/file.svg";
 import DirectoryIcon from "Assets/icons/directory.svg";
@@ -18,8 +19,7 @@ import UploadIcon from "Assets/icons/upload.svg";
 import UploadDirectoryIcon from "Assets/icons/upload-directory.svg";
 import DirectoryAddIcon from "Assets/icons/folder-plus.svg";
 import PictureIcon from "Assets/icons/image.svg";
-import DeleteIcon from "Assets/icons/x-circle.svg";
-import Confirm from "Components/common/Confirm";
+import DeleteIcon from "Assets/icons/x-square.svg";
 
 const DirectoryModal = observer(({Create, Close}) => {
   const [name, setName] = useState("");
@@ -86,7 +86,7 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
   const filesRef = useRef(undefined);
   const directoriesRef = useRef(undefined);
 
-  const mimeTypes = (editStore.files[objectId] || {})["mime-types"] || {};
+  const mimeTypes = (filesStore.files[objectId] || {})["mime-types"] || {};
 
   const SetSort = (key) => {
     if(sortKey === key) {
@@ -97,7 +97,7 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
     }
   };
 
-  let fileMetadata = (editStore.files[objectId] || {}).files || {};
+  let fileMetadata = (filesStore.files[objectId] || {}).files || {};
   pathElements.forEach(element => fileMetadata = fileMetadata[element]);
 
   const files = Object.keys(fileMetadata)
@@ -142,7 +142,7 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
       setUploadStatus(0);
       setLoading(true);
       const fileInfo = await FileInfo(UrlJoin(...pathElements), event.target.files);
-      await editStore.UploadFiles({objectId, fileInfo, callback: status => setUploadStatus(status)});
+      await filesStore.UploadFiles({objectId, fileInfo, callback: status => setUploadStatus(status)});
     } finally {
       setLoading(false);
       setUploadStatus(0);
@@ -152,7 +152,7 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
   return (
     <AsyncComponent
       className="file-browser file-browser-loader"
-      Load={async () => await editStore.Files({objectId})}
+      Load={async () => await filesStore.Files({objectId})}
     >
       <div className="file-browser">
         { directoryModal }
@@ -182,7 +182,7 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
                 setDirectoryModal(
                   <DirectoryModal
                     Create={async name => {
-                      await editStore.CreateDirectory({objectId, directory: UrlJoin(...pathElements, name)});
+                      await filesStore.CreateDirectory({objectId, directory: UrlJoin(...pathElements, name)});
                       setDirectoryModal(null);
                     }}
                     Close={() => setDirectoryModal(null)}
@@ -328,7 +328,7 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
 
                       await Confirm({
                         message: `Are you sure you want to delete '${name}'?`,
-                        Confirm: async () => editStore.DeleteFile({objectId, path: UrlJoin(...pathElements, name)})
+                        Confirm: async () => filesStore.DeleteFile({objectId, path: UrlJoin(...pathElements, name)})
                       });
                     }}
                   >

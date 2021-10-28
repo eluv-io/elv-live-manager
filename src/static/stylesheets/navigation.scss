@@ -17,6 +17,7 @@
 
     &-back {
       background-color: $darkergray;
+      margin-bottom: 20px;
     }
 
     &.active {
@@ -38,6 +39,7 @@
   &-sub {
     background: $darkgray;
     border-left: 1px solid $darkergray;
+    min-width: 200px;
   }
 }
 

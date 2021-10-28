@@ -30,7 +30,9 @@ body {
 
 a,
 button,
-input {
+input,
+textarea,
+select {
   &:focus {
     outline: 0;
   }
@@ -97,72 +99,25 @@ body,
   justify-content: center;
 }
 
-.actions-container {
-  align-items: center;
-  display: flex;
-  padding: 20px 0;
-  width: 100%;
+.edit-page {
+  &__header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    min-height: 35px;
 
-  .action {
-    border-radius: 3px;
-    cursor: pointer;
-    height: 40px;
-    min-width: 130px;
-    padding: 8px 20px;
-    text-align: center;
-    user-select: none;
-
-    &:not(:first-child) {
-      margin-left: 12px;
-    }
-
-    &:disabled {
-      opacity: 0.4;
-    }
-
-    &-icon {
-      height: 40px;
-      min-width: 40px;
-      padding: 5px;
-      width: 40px;
-
-      &__icon {
-        height: 100%;
-        stroke: $darkgray;
-        stroke-width: 1.5px;
-        width: 100%;
-      }
-
-      &:hover {
-        * {
-          stroke: $blue;
-        }
-      }
-    }
-
-    &-primary {
-      background: linear-gradient(150deg, darken($blue, 3%), lighten($blue, 3%));
-      border: 1px solid $blue;
-      color: $white;
-
-      &:not(:disabled) {
-        &:hover {
-          background: linear-gradient(80deg, $blue, lighten($blue, 5%));
-        }
-      }
-    }
-
-    &-secondary {
-      border: 1px solid $mediumgray;
-      color: $black;
+    .page-header {
+      margin: 0;
     }
   }
 
-  .action-input {
-    border: 1px solid $mediumgray;
-    height: 40px;
-    max-width: 300px;
-    padding: 5px 10px;
-    width: 100%;
+  &__localization-select {
+    font-size: 14px;
+    min-width: 200px;
+
+    &-active {
+      filter: drop-shadow(0 0 2px $gold);
+    }
   }
 }

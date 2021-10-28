@@ -2,8 +2,8 @@ import React, {useState, useEffect} from "react";
 import {PageLoader} from "Components/common/Loader";
 import {observer} from "mobx-preact";
 
-const AsyncComponent = observer(({Load, children, Render, className=""}) => {
-  const [loaded, setLoaded] = useState(false);
+const AsyncComponent = observer(({loaded, Load, children, Render, className=""}) => {
+  const [isLoaded, setLoaded] = useState(loaded);
   const [error, setError] = useState(undefined);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const AsyncComponent = observer(({Load, children, Render, className=""}) => {
     );
   }
 
-  if(!loaded) {
+  if(!isLoaded) {
     return <PageLoader className={className} />;
   }
 

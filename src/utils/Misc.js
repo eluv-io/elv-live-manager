@@ -24,6 +24,52 @@ export const onEnterPressed = (fn) => {
   };
 };
 
+export const SafeTraverse = (object, ...keys) => {
+  if(!object) { return object; }
+
+  // Default: Passed a list of key arguments
+  if(keys.length === 1 && Array.isArray(keys[0])) {
+    // Passed an array of keys
+    keys = keys[0];
+  } else if(keys.length === 1 && typeof keys[0] === "string") {
+    // Passed a slash delimited path
+    keys = keys[0].split("/").filter(element => element);
+  }
+
+  let result = object;
+  for(let i = 0; i < keys.length; i++){
+    result = result[keys[i]];
+
+    if(result === undefined) { return undefined; }
+  }
+
+  return result;
+};
+
+export const SafeSet = (object, value, ...keys) => {
+  if(!object) { return object; }
+
+  // Default: Passed a list of key arguments
+  if(keys.length === 1 && Array.isArray(keys[0])) {
+    // Passed an array of keys
+    keys = keys[0];
+  } else if(keys.length === 1 && typeof keys[0] === "string") {
+    // Passed a slash delimited path
+    keys = keys[0].split("/").filter(element => element);
+  }
+
+  let pointer = object;
+  keys.forEach((key, index) => {
+    if(index === keys.length - 1) {
+      pointer[key] = value;
+    } else {
+      if(!pointer[key]) { pointer[key] = {}; }
+
+      pointer = pointer[key];
+    }
+  });
+};
+
 export const SetFramePath = () => {
   const match = useRouteMatch();
 
