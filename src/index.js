@@ -8,8 +8,7 @@ import {
   HashRouter,
   Switch,
   Route,
-  Redirect,
-  withRouter
+  Redirect
 } from "react-router-dom";
 import ScrollToTop from "Components/common/ScrollToTop";
 import {ErrorBoundary} from "Components/common/ErrorBoundary";
@@ -45,14 +44,6 @@ const Routes = () => {
     </Switch>
   );
 };
-
-const CurrentPath = withRouter(({location}) => {
-  return (
-    <div className="current-path">
-      { location.pathname }
-    </div>
-  );
-});
 
 const App = observer(() => {
   return (

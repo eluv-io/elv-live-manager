@@ -224,11 +224,14 @@ const ContentBrowser = observer(({header, Select, Close, requireVersion=false}) 
             }
           }}
         />
-        <div className="actions-container">
-          <button className="action action-secondary" onClick={Close}>
-            Cancel
-          </button>
-        </div>
+        {
+          Close ?
+            <div className="actions-container">
+              <button className="action action-secondary" onClick={Close}>
+                Cancel
+              </button>
+            </div> : null
+        }
       </div>
       <div className="content-browser__header">
         <h1 className="content-header">

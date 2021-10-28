@@ -137,6 +137,18 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
       }
     });
 
+  const Upload = async event => {
+    try {
+      setUploadStatus(0);
+      setLoading(true);
+      const fileInfo = await FileInfo(UrlJoin(...pathElements), event.target.files);
+      await editStore.UploadFiles({objectId, fileInfo, callback: status => setUploadStatus(status)});
+    } finally {
+      setLoading(false);
+      setUploadStatus(0);
+    }
+  };
+
   return (
     <AsyncComponent
       className="file-browser file-browser-loader"
@@ -189,34 +201,14 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
               style={{display: "none"}}
               ref={filesRef}
               type="file"
-              onChange={async event => {
-                try {
-                  setUploadStatus(0);
-                  setLoading(true);
-                  const fileInfo = await FileInfo(UrlJoin(...pathElements), event.target.files);
-                  await editStore.UploadFiles({objectId, fileInfo, callback: status => setUploadStatus(status)});
-                } finally {
-                  setLoading(false);
-                  setUploadStatus(0);
-                }
-              }}
+              onChange={Upload}
               multiple
             />
             <input
               style={{display: "none"}}
               ref={directoriesRef}
               type="file"
-              onChange={async event => {
-                try {
-                  setUploadStatus(0);
-                  setLoading(true);
-                  const fileInfo = await FileInfo(UrlJoin(...pathElements), event.target.files);
-                  await editStore.UploadFiles({objectId, fileInfo, callback: status => setUploadStatus(status)});
-                } finally {
-                  setLoading(false);
-                  setUploadStatus(0);
-                }
-              }}
+              onChange={Upload}
               multiple
               webkitdirectory
               mozdirectory

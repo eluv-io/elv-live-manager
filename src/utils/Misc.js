@@ -1,3 +1,7 @@
+import {useRouteMatch} from "react-router-dom";
+import {useEffect} from "react";
+import {rootStore} from "Stores";
+
 export const LogMessage = message => {
   console.log(message);
 };
@@ -18,4 +22,21 @@ export const onEnterPressed = (fn) => {
 
     fn(event);
   };
+};
+
+export const SetFramePath = () => {
+  const match = useRouteMatch();
+
+  useEffect(() => {
+    if(rootStore.client) {
+      rootStore.client.SendMessage({
+        options: {
+          operation: "SetFramePath",
+          path: `/#${match.url}`
+        }
+      });
+    }
+  });
+
+  return null;
 };

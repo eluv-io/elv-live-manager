@@ -4,11 +4,11 @@ import {observer} from "mobx-preact";
 import EventNavigation from "Components/events/Navigation";
 import { contentStore } from "Stores";
 import UrlJoin from "url-join";
-import Modal from "Components/common/Modal";
-import FileBrowser, {FileBrowserModal} from "Components/common/FileBrowser";
+import FileBrowser from "Components/common/FileBrowser";
 import {PageLoader} from "Components/common/Loader";
 import {ErrorBoundary} from "Components/common/ErrorBoundary";
-import {ContentBrowserModal} from "Components/ContentBrowser";
+import ContentBrowser, {ContentBrowserModal} from "Components/ContentBrowser";
+import {SetFramePath} from "Utils/Misc";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -48,18 +48,19 @@ const EventPage = observer(({children, Render}) => {
   const match = useRouteMatch();
   const event = match.params.eventId && contentStore.Event(match.params.eventId);
 
-  if(match.params.eventId && !event) {
-    return <PageLoader />;
-  }
-
   return (
     <ErrorBoundary>
+      <SetFramePath />
       <div className="page-container page-container-nav">
         <EventNavigation />
-        <div className="page-content">
-          <h1 className="page-header">{event ? event.name : "Events"}</h1>
-          { Render ? Render() : children }
-        </div>
+        {
+          match.params.eventId && !event ?
+            <PageLoader /> :
+            <div className="page-content">
+              <h1 className="page-header">{event ? event.name : "Events"}</h1>
+              { Render ? Render() : children }
+            </div>
+        }
       </div>
     </ErrorBoundary>
   );
@@ -80,7 +81,7 @@ const Events = () => {
       </Route>
       <Route path="/events/:eventId/marketplace">
         <EventPage>
-          <Event />
+          <ContentBrowser requireVersion />
         </EventPage>
       </Route>
       <Route path="/events/:eventId/nfts">
