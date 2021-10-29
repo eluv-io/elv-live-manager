@@ -7,7 +7,7 @@ import UrlJoin from "url-join";
 import FileBrowser from "Components/common/FileBrowser";
 import {PageLoader} from "Components/common/Loader";
 import {ErrorBoundary} from "Components/common/ErrorBoundary";
-import ContentBrowser, {ContentBrowserModal} from "Components/ContentBrowser";
+import ContentBrowser, {ContentBrowserModal} from "Components/common/ContentBrowser";
 import {SetFramePath} from "Utils/Misc";
 import EditPage from "Components/common/EditPage";
 import {Input} from "Components/common/Inputs";

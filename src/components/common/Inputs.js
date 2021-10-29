@@ -9,7 +9,7 @@ import {FileBrowserModal} from "Components/common/FileBrowser";
 import {ImageExtensions} from "Utils/Files";
 import UrlJoin from "url-join";
 import ImagePreview from "Components/common/ImagePreview";
-import {ContentBrowserModal} from "Components/ContentBrowser";
+import {ContentBrowserModal} from "Components/common/ContentBrowser";
 import Utils from "@eluvio/elv-client-js/src/Utils";
 
 import Hints from "Assets/documentation/InputHints.yaml";
@@ -446,7 +446,7 @@ export const ContentInput = observer((props) => {
                     <IconButton
                       onClick={() => {
                         if(player) { player.Destroy(); }
-                        
+
                         setPlayer(undefined);
                         setShowPreview(!showPreview);
                       }}
