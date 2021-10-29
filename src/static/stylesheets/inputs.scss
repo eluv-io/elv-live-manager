@@ -5,67 +5,69 @@
   width: 100%;
 
   .action {
-    border-radius: 3px;
-    cursor: pointer;
-    height: 35px;
-    min-width: 130px;
-    padding: 8px 20px;
-    text-align: center;
-    user-select: none;
-
     &:not(:first-child) {
       margin-left: 12px;
     }
+  }
+}
 
-    &:disabled {
-      opacity: 0.4;
-    }
+.action {
+  border-radius: 3px;
+  cursor: pointer;
+  height: 35px;
+  min-width: 130px;
+  padding: 8px 20px;
+  text-align: center;
+  user-select: none;
 
-    &-icon {
-      height: 35px;
-      min-width: 35px;
-      padding: 5px;
-      width: 35px;
-
-      &__icon {
-        height: 100%;
-        stroke: $darkgray;
-        stroke-width: 1.5px;
-        width: 100%;
-      }
-
-      &:hover {
-        * {
-          stroke: $blue;
-        }
-      }
-    }
-
-    &-primary {
-      background: linear-gradient(150deg, darken($blue, 3%), lighten($blue, 3%));
-      border: 1px solid $blue;
-      color: $white;
-
-      &:not(:disabled) {
-        &:hover {
-          background: linear-gradient(80deg, $blue, lighten($blue, 5%));
-        }
-      }
-    }
-
-    &-secondary {
-      border: 1px solid $mediumgray;
-      color: $black;
-    }
+  &:disabled {
+    opacity: 0.4;
   }
 
-  .action-input {
-    border: 1px solid $mediumgray;
+  &-icon {
     height: 35px;
-    max-width: 300px;
-    padding: 5px 10px;
-    width: 100%;
+    min-width: 35px;
+    padding: 5px;
+    width: 35px;
+
+    &__icon {
+      height: 100%;
+      stroke: $darkgray;
+      stroke-width: 1.5px;
+      width: 100%;
+    }
+
+    &:hover {
+      * {
+        stroke: $blue;
+      }
+    }
   }
+
+  &-primary {
+    background: linear-gradient(150deg, darken($blue, 3%), lighten($blue, 3%));
+    border: 1px solid $blue;
+    color: $white;
+
+    &:not(:disabled) {
+      &:hover {
+        background: linear-gradient(80deg, $blue, lighten($blue, 5%));
+      }
+    }
+  }
+
+  &-secondary {
+    border: 1px solid $mediumgray;
+    color: $black;
+  }
+}
+
+.action-input {
+  border: 1px solid $mediumgray;
+  height: 35px;
+  max-width: 400px;
+  padding: 5px 10px;
+  width: 100%;
 }
 
 select {
@@ -80,7 +82,7 @@ select {
   cursor: pointer;
   height: 35px;
   overflow: hidden;
-  padding: 5px 10px;
+  padding: 5px 6px;
   position: relative;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -107,20 +109,52 @@ input {
 
 .labelled-field {
   align-items: flex-start;
+  border-bottom: 1px solid $lightergray;
   display: flex;
+  margin-bottom: 10px;
   min-height: 45px;
+  width: min-content;
 
   label {
+    align-items: center;
     color: $darkgray;
-    margin-top: 8px;
-    width: 160px;
+    cursor: pointer;
+    display: flex;
+    font-size: 14px;
+    height: 35px;
+    justify-content: flex-start;
+    min-width: 200px;
+    padding-right: 20px;
+    width: 200px;
   }
 
-  input,
-  textarea,
-  select {
+  &__label-text {
+    width: max-content;
+  }
+
+  &__hint {
+    cursor: pointer;
+    height: 30px;
+    padding-bottom: 10px;
+    width: 30px;
+
+    * {
+      stroke: $gold;
+    }
+  }
+
+  &__hint-content {
+    background-color: $white;
+    border: 1px solid $mediumgray;
+    border-radius: 3px;
+    filter: drop-shadow(0 0 5px $light-translucent-black);
+    max-width: 350px;
+    padding: 15px 20px;
+  }
+
+  input {
     &:not([type="checkbox"]) {
-      min-width: 300px;
+      min-width: 400px;
     }
 
     &[type="checkbox"] {
@@ -128,20 +162,27 @@ input {
       width: 20px;
     }
   }
+
+  textarea,
+  select {
+    min-width: 400px;
+  }
 }
 
 .multiselect {
+  margin-bottom: 10px;
+
   &__selection {
     align-items: center;
     display: flex;
     margin-bottom: 10px;
-    max-width: 300px;
+    max-width: 400px;
     width: 100%;
 
     select {
       flex: 1 1 100%;
       min-width: unset;
-      width: 300px;
+      width: 400px;
     }
   }
 
@@ -149,10 +190,116 @@ input {
     padding: 0;
     width: auto;
 
-
-    .multiselect__button-add {
+    .multiselect__button {
+      border: 1px solid $mediumgray;
       display: flex;
-      padding-left: 0;
+      padding: 0;
+
+      line {
+        stroke: $darkgray;
+        stroke-width: 1px;
+      }
+
+      &:hover {
+        * {
+          stroke: $blue;
+        }
+      }
+    }
+
+    .multiselect__button-remove {
+      margin-left: 10px;
+    }
+  }
+}
+
+.link-selection {
+  margin-bottom: 20px;
+  min-width: 400px;
+  width: 500px;
+
+  &__select-button {
+    font-size: 12px;
+    height: 35px;
+    min-width: 100px;
+    padding: 0 10px;
+
+    &:not(:first-child) {
+      margin-top: 10px;
+    }
+  }
+
+  &__selected {
+    align-items: center;
+    border: 1px solid $mediumgray;
+    border-radius: 3px;
+    display: flex;
+    height: 35px;
+    min-width: 400px;
+    width: 100%;
+  }
+
+  &__selected__path {
+    @include ellipsis;
+    flex: 1 1 100%;
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  &__selected__icon {
+    height: 25px;
+    margin: 0 10px 0 5px;
+    min-width: 25px;
+    padding: 0;
+  }
+
+  &__selected__remove {
+    height: 35px;
+    width: 35px;
+  }
+
+  &__icon {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    padding: 0;
+
+    * {
+      stroke: $darkgray;
+      stroke-width: 1.5px;
+    }
+
+    &:hover {
+      * {
+        stroke: $blue;
+      }
+    }
+  }
+
+  &__selected__labelled-field,
+  &__alt-text__labelled-field {
+
+    label {
+      min-width: 100px;
+      width: 100px;
+    }
+
+    input {
+      width: 100%;
+    }
+  }
+
+  &__video-preview {
+    height: 280px;
+    max-height: 280px;
+    min-width: 500px;
+    width: 500px;
+
+    video {
+      height: 280px;
+      max-height: 280px;
+      min-width: 500px;
+      width: 500px;
     }
   }
 }

@@ -7,18 +7,17 @@ import PrettyBytes from "pretty-bytes";
 import Modal from "Components/common/Modal";
 import {Loader} from "Components/common/Loader";
 import ImageIcon from "Components/common/ImageIcon";
-import {FileInfo, imageTypes} from "Utils/Files";
+import {FileInfo, ImageExtensions} from "Utils/Files";
 import ImagePreview from "Components/common/ImagePreview";
 import {onEnterPressed} from "Utils/Misc";
 import Confirm from "Components/common/Confirm";
 
 import FileIcon from "Assets/icons/file.svg";
 import DirectoryIcon from "Assets/icons/directory.svg";
-
+import PictureIcon from "Assets/icons/image.svg";
 import UploadIcon from "Assets/icons/upload.svg";
 import UploadDirectoryIcon from "Assets/icons/upload-directory.svg";
 import DirectoryAddIcon from "Assets/icons/folder-plus.svg";
-import PictureIcon from "Assets/icons/image.svg";
 import DeleteIcon from "Assets/icons/x-square.svg";
 
 const DirectoryModal = observer(({Create, Close}) => {
@@ -123,7 +122,7 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
         extension: mimeTypes[extension] || extension,
         size: fileInfo.size ? PrettyBytes(fileInfo.size) : 0,
         valid: !extensions || extensions.includes(extension),
-        isImage: imageTypes.includes(extension)
+        isImage: ImageExtensions.includes(extension)
       };
     })
     .filter(file => file && (!filter || file.name.toLowerCase().includes(filter.toLowerCase())))
@@ -291,6 +290,8 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
                       pathElements,
                       path: UrlJoin(...pathElements, name)
                     });
+
+                    Close();
                   }
                 }}
               >

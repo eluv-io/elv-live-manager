@@ -6,6 +6,7 @@ import Utils from "@eluvio/elv-client-js/src/Utils";
 class EditStore {
   currentLocalization = "default";
   writeTokens = {};
+  versionHashes = {};
 
   edits = {}
   originalMetadata = {};
@@ -28,7 +29,7 @@ class EditStore {
     this.rootStore = rootStore;
   }
 
-  LoadMetadata = flow(function * ({objectId, versionHash}) {
+  LoadMetadata = flow(function * ({objectId, versionHash, path}) {
     if(this.originalMetadata[objectId]) { return; }
 
     if(!objectId) {
@@ -37,9 +38,10 @@ class EditStore {
       versionHash = yield this.client.LatestVersionHash({objectId});
     }
 
+    this.versionHashes[objectId] = versionHash;
     this.originalMetadata[objectId] = yield this.client.ContentObjectMetadata({
       versionHash,
-      metadataSubtree: "/public/asset_metadata"
+      metadataSubtree: path || "/public/asset_metadata"
     });
   });
 

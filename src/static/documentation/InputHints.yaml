@@ -1,0 +1,21 @@
+events:
+  hero_image: This is the hero image that will be displayed on wide screens, such as desktops, laptops and tablets.
+  hero_image_mobile: This is the hero image that will be displayed on narrow screens, such as phones. It is highly recommended that you have a mobile-optimized hero image.
+  logo_link: If a custom logo is set, you can specify a custom URL for the logo image to link to instead of live.eluv.io.
+  slug: |
+    This is the URL slug for this event. The URL for your site will be
+
+    https://live.eluv.io/<event-slug>
+
+    (if accessed from the featured sites on the main page) or
+
+    https://live.eluv.io/<tenant-slug>/<event-slug>
+
+misc:
+  alt-text: This text helps screen-reading tools describe images to visually impaired readers and allows search engines to better crawl and rank your website.
+  localizations: |
+    Select the languages / locales you would like the site to be available in.
+
+    If any localizations are specified, you can set values for localizable fields by selecting a localization from the select box in the top right corner.
+
+    If a localized value is not set it will use the default value for that field, so you only need to specify the fields you would like to override from their default value.

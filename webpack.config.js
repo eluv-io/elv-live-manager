@@ -77,9 +77,13 @@ module.exports = {
       // Not necessary unless you consume a module using `createClass`
       'create-react-class': 'preact-compat/lib/create-react-class',
       // Not necessary unless you consume a module requiring `react-dom-factories`
-      'react-dom-factories': 'preact-compat/lib/react-dom-factories'
+      'react-dom-factories': 'preact-compat/lib/react-dom-factories',
+      "@eluvio/elv-client-js$": "@eluvio/elv-client-js/dist/ElvClient-min.js"
     },
-    extensions: [".js", ".jsx", ".scss", ".png", ".svg"]
+    extensions: [".js", ".jsx", ".scss", ".png", ".svg"],
+    fallback: {
+      stream: false
+    }
   },
   module: {
     rules: [
@@ -134,6 +138,11 @@ module.exports = {
       {
         test: /\.(txt|bin|abi)$/i,
         loader: "raw-loader"
+      },
+      {
+        test: /\.ya?ml$/,
+        type: "json", // Required by Webpack v4
+        use: "yaml-loader"
       }
     ]
   }

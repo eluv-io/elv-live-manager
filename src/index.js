@@ -3,6 +3,7 @@ import "Assets/stylesheets/app.scss";
 import React from "react";
 import { render } from "react-dom";
 import { observer} from "mobx-preact";
+import {rootStore} from "Stores";
 
 import {
   HashRouter,
@@ -46,6 +47,7 @@ const Routes = () => {
 };
 
 const App = observer(() => {
+  console.log(rootStore.client);
   return (
     <HashRouter>
       <div className="app-container">

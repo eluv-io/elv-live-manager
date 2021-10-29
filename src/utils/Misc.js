@@ -71,6 +71,8 @@ export const SafeSet = (object, value, ...keys) => {
 };
 
 export const SetFramePath = () => {
+  return null;
+
   const match = useRouteMatch();
 
   useEffect(() => {

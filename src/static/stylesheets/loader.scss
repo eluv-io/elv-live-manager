@@ -36,6 +36,7 @@
     animation-play-state: running, running;
     animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1), cubic-bezier(0.3, 0.61, 0.355, 1);
     border: 5px solid $translucent-black;
+    //border-width: 3px !important;
     border-radius: 30%;
     height: 100%;
     left: 0;
@@ -47,18 +48,22 @@
 
   &__element-1 {
     animation-delay: -0.4s;
+    border-width: 4px;
   }
 
   &__element-2 {
     animation-delay: -0.8s;
+    border-width: 3px;
   }
 
   &__element-3 {
     animation-delay: -1.2s;
+    border-width: 2px;
   }
 
   &__element-4 {
     animation-delay: -1.6s;
+    border-width: 1px;
   }
 }
 
@@ -69,7 +74,6 @@
   justify-content: center;
   margin: auto;
   min-height: 400px;
-  min-width: 100%;
   width: 100%;
 
   .loader {

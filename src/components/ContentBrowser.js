@@ -153,8 +153,8 @@ const ObjectBrowser = observer(({libraryId, Select}) => {
         <div className="list content-list content-list-objects">
           {
             (objects || [])
-              .map(({objectId, versionHash, name, title}) =>
-                <button title={title} onClick={() => Select({name, objectId, versionHash})} className="list__item content-list__item" key={`object-${objectId}`}>
+              .map(({objectId, versionHash, name, playable, title}) =>
+                <button title={title} onClick={() => Select({name, playable, objectId, versionHash})} className="list__item content-list__item" key={`object-${objectId}`}>
                   { name }
                 </button>
               )
@@ -202,16 +202,21 @@ const ContentBrowser = observer(({header, Select, Close, requireVersion=false}) 
   const [libraryId, setLibraryId] = useState("");
   const [objectId, setObjectId] = useState("");
   const [objectName, setObjectName] = useState("");
+  const [objectPlayable, setObjectPlayable] = useState(false);
 
+  const FinalSelect = args => {
+    Select(args);
+    Close();
+  };
   return (
     <div className="content-browser">
       <div className="content-browser__header-actions">
         <ContentLookup
-          Select={({name, libraryId, objectId, versionHash, latestVersionHash}) => {
+          Select={({name, playable, libraryId, objectId, versionHash, latestVersionHash}) => {
             if(versionHash) {
-              Select({libraryId, objectId, versionHash});
+              FinalSelect({name, libraryId, objectId, versionHash});
             } else if(objectId && !requireVersion) {
-              Select({libraryId, objectId, versionHash: latestVersionHash});
+              FinalSelect({name, libraryId, objectId, versionHash: latestVersionHash});
             } else if(objectId) {
               setLibraryId(libraryId);
               setObjectId(objectId);
@@ -219,9 +224,8 @@ const ContentBrowser = observer(({header, Select, Close, requireVersion=false}) 
               setLibraryId(libraryId);
             }
 
-            if(name) {
-              setObjectName(name);
-            }
+            setObjectName(name);
+            setObjectPlayable(playable);
           }}
         />
         {
@@ -247,6 +251,7 @@ const ContentBrowser = observer(({header, Select, Close, requireVersion=false}) 
                 if(objectId) {
                   setObjectId(undefined);
                   setObjectName("");
+                  setObjectPlayable(false);
                 } else {
                   setLibraryId(undefined);
                 }
@@ -269,12 +274,15 @@ const ContentBrowser = observer(({header, Select, Close, requireVersion=false}) 
       { libraryId && !objectId ?
         <ObjectBrowser
           libraryId={libraryId}
-          Select={({name, objectId, versionHash}) => {
+          Select={({name, playable, objectId, versionHash}) => {
             if(requireVersion) {
               setObjectName(name);
+              setObjectPlayable(name);
               setObjectId(objectId);
             } else {
-              Select({
+              FinalSelect({
+                name,
+                playable,
                 libraryId,
                 objectId,
                 versionHash
@@ -287,7 +295,7 @@ const ContentBrowser = observer(({header, Select, Close, requireVersion=false}) 
         <VersionBrowser
           libraryId={libraryId}
           objectId={objectId}
-          Select={versionHash => Select({libraryId, objectId, versionHash})}
+          Select={versionHash => FinalSelect({name: objectName, playable: objectPlayable, libraryId, objectId, versionHash})}
         /> : null
       }
     </div>

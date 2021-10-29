@@ -10,13 +10,14 @@ const BasicInfo = observer(() => {
   const objectId = match.params.eventId;
 
   return (
-    <form className="form">
+    <div aria-roledescription="form" className="form">
       <div className="form__section">
         <h2 className="form__section__header">
           Basic Info
         </h2>
-        <Input label="Event" objectId={objectId} name="event_name" localize />
-        <Input label="Page Title" objectId={objectId} name="page_title" localize />
+        <Input label="Event Name" objectId={objectId} path="" name="display_title" localize />
+        <Input label="Event Slug" objectId={objectId} path="" name="slug" hint="events/slug" localize />
+        <Input label="Browser Page Title" objectId={objectId} name="page_title" localize />
         <Select label="Type" objectId={objectId} name="type">
           <option value="streaming_event">Ticketed Streaming Event</option>
           <option value="drop_event">NFT Drop Event</option>
@@ -29,10 +30,12 @@ const BasicInfo = observer(() => {
           label="Localizations"
           name="localizations"
           buttonLabel="Localization"
+          hint="misc/localizations"
           options={Object.keys(LanguageCodes).map(code => [LanguageCodes[code], code])}
         />
+        <Input label="Show Cookie Banner" objectId={objectId} path="info/event_info" name="show_cookie_banner" type="checkbox" />
       </div>
-    </form>
+    </div>
   );
 });
 

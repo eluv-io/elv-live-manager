@@ -126,7 +126,8 @@ class ContentStore {
         select: [
           "public/name",
           "public/asset_metadata/title",
-          "public/asset_metadata/display_title"
+          "public/asset_metadata/display_title",
+          "public/asset_metadata/sources"
         ],
         sort: sortKey,
         start: (page - 1) * this.OBJECTS_PER_PAGE,
@@ -150,6 +151,7 @@ class ContentStore {
         objectId: id,
         versionHash,
         name: (metadata.public || {}).name || id,
+        playable: !!assetMetadata.sources,
         title: assetMetadata.display_title || assetMetadata.title
       }
     });

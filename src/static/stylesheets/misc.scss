@@ -1,22 +1,10 @@
-.image-preview {
-  position: relative;
-
-  &__image-container {
-    left: 30px;
-    max-height: 250px;
-    opacity: 1;
-    position: absolute;
-    width: 250px;
-    z-index: 100;
-  }
-
-  &__image {
-    filter: drop-shadow(3px 3px 20px $translucent-black);
-    max-height: 250px;
-    max-width: 250px;
-    object-fit: contain;
-    overflow: hidden;
-  }
+.image-preview__image {
+  background-color: transparent;
+  filter: drop-shadow(0 0 5px $translucent-black);
+  max-height: 300px;
+  max-width: 300px;
+  object-fit: contain;
+  overflow: hidden;
 }
 
 .confirm {
@@ -37,5 +25,28 @@
 
   .action {
     min-width: 150px;
+  }
+}
+
+.tooltip {
+  align-items: center;
+  background-color: $white;
+  border: 1px solid $mediumgray;
+  border-radius: 3px;
+  color: $black;
+  display: flex;
+  font-size: 14px;
+  justify-content: center;
+  max-width: 250px;
+  min-width: 50px;
+  opacity: 1;
+  padding: 5px 10px;
+  pointer-events: none;
+  text-align: center;
+  user-select: none;
+  z-index: 10000;
+
+  span {
+    padding: 10px;
   }
 }

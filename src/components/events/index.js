@@ -14,6 +14,7 @@ import {Input} from "Components/common/Inputs";
 import AsyncComponent from "Components/common/AsyncComponent";
 import BasicInfo from "Components/events/pages/BasicInfo";
 import MainPage from "Components/events/pages/MainPage";
+import {set} from "mobx";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -60,7 +61,7 @@ const EventPage = observer(({children, Render}) => {
             await editStore.LoadMetadata({objectId: match.params.eventId});
           }}
         >
-          <EditPage header={event ? event.name : "Events"}>
+          <EditPage header={event ? editStore.Value(match.params.eventId, "", "display_title") || event.name : "Events"}>
             { Render ? Render() : children }
           </EditPage>
         </AsyncComponent>

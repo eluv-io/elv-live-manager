@@ -59,6 +59,10 @@ body,
   width: 100%;
 }
 
+.eluvio-player__controls {
+  z-index: 1;
+}
+
 .page-content {
   height: 100%;
   overflow-y: auto;
