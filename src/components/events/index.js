@@ -16,6 +16,7 @@ import BasicInfo from "Components/events/pages/BasicInfo";
 import MainPage from "Components/events/pages/MainPage";
 import {set} from "mobx";
 import {TicketClass, Tickets, TicketSku} from "Components/events/pages/Tickets";
+import Breadcrumbs from "Components/navigation/Breadcrumbs";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -51,7 +52,6 @@ const EventPage = observer(({children, Render}) => {
 
   return (
     <ErrorBoundary key={`event-page-${match.url}`}>
-      <SetFramePath />
       <div className="page-container page-container-nav">
         <EventNavigation />
         <AsyncComponent
@@ -114,6 +114,11 @@ const Events = () => {
           <Placeholder text="Social" />
         </EventPage>
       </Route>
+      <Route exact path="/events/:eventId/sponsors">
+        <EventPage>
+          <Placeholder text="Sponsors" />
+        </EventPage>
+      </Route>
       <Route exact path="/events/:eventId/search">
         <EventPage>
           <Placeholder text="Search" />
@@ -124,7 +129,7 @@ const Events = () => {
           <Placeholder text="Drops" />
         </EventPage>
       </Route>
-      <Route exact path="/events/:eventId/tickets">
+      <Route exact path="/events/:eventId/tickets" cock={"balls"}>
         <EventPage>
           <Tickets />
         </EventPage>

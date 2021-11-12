@@ -1,6 +1,12 @@
 import {useRouteMatch} from "react-router-dom";
 import {useEffect} from "react";
-import {editStore, rootStore} from "Stores";
+import {rootStore} from "Stores";
+import Utils from "@eluvio/elv-client-js/src/Utils";
+import {parse as UUIDParse, v4 as UUID} from "uuid";
+
+export const GenerateUUID = () => {
+  return Utils.B58(UUIDParse(UUID()));
+};
 
 export const LogMessage = message => {
   console.log(message);

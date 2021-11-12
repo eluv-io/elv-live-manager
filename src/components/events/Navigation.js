@@ -22,7 +22,8 @@ const EventNavigation = observer(() => {
       <NavLink className="navigation__link" to={UrlJoin(basePath, "landing")}>Landing Page</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "info")}>Info Cards</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "footer")}>Footer</NavLink>
-      <NavLink className="navigation__link" to={UrlJoin(basePath, "social")}>Sponsors and Social</NavLink>
+      <NavLink className="navigation__link" to={UrlJoin(basePath, "sponsors")}>Sponsors</NavLink>
+      <NavLink className="navigation__link" to={UrlJoin(basePath, "social")}>Social Media</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "tickets")}>Tickets</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "drops")}>Drops</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "search")}>Search and Analytics</NavLink>

@@ -29,7 +29,8 @@ const ConfirmModal = ({message, Confirm, Close}) => {
                     try {
                       setConfirming(true);
                       await Confirm();
-                    } finally {
+                    } catch(error) {
+                      console.error(error);
                       setConfirming(false);
                     }
                   }}

@@ -1,9 +1,9 @@
 import {observer} from "mobx-react";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import Confirm from "Components/common/Confirm";
 import ImageIcon from "Components/common/ImageIcon";
 import DeleteIcon from "Assets/icons/x-square";
-import React from "react";
+import React, {useState} from "react";
 
 const DetailList = observer(
   ({
@@ -15,8 +15,15 @@ const DetailList = observer(
     noItemsMessage="No Items Available",
     createText="Create Item",
     Create,
+    removeText="Are you sure you want to remove this item?",
     Remove
   }) => {
+    const [redirect, setRedirect] = useState(undefined);
+
+    if(redirect) {
+      return <Redirect to={redirect} />;
+    }
+
     const rowStyle = { gridTemplateColumns: columnSizes + " 50px" };
     return (
       <>
@@ -24,7 +31,7 @@ const DetailList = observer(
           { header }
         </h2>
         <div className="actions-container">
-          <button className="action action-primary" onClick={Create}>{ createText }</button>
+          <button className="action action-primary" onClick={() => setRedirect(Create)}>{ createText }</button>
         </div>
         {
           items.length === 0 ?
@@ -55,8 +62,9 @@ const DetailList = observer(
                           event.preventDefault();
                           event.stopPropagation();
 
+                          console.log(itemIndex);
                           await Confirm({
-                            message: "Are you sure you want to delete this item?",
+                            message: typeof removeText === "function" ? removeText(item) : removeText,
                             Confirm: async () => await Remove(itemIndex)
                           });
                         }}

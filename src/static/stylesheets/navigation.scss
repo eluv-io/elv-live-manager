@@ -65,7 +65,7 @@
   align-items: center;
   display: flex;
 
-  a {
+  &__link {
     @include ellipsis;
 
     border: 1px solid $blue;
@@ -78,12 +78,21 @@
     padding: 5px 10px;
   }
 
+  &__link-active {
+    border: 1px solid $black;
+    color: $black;
+  }
+
   &__link-separator {
     content: "/";
     padding: 0 10px;
 
     &::before {
       content: "/";
+    }
+
+    &:last-child {
+      display: none;
     }
   }
 }

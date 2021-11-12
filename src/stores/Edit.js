@@ -82,8 +82,8 @@ class EditStore {
   }
 
   SetValue(objectId, path, name, value, options={}) {
-    path = path || "";
-    name = name || "";
+    path = (typeof path === "undefined" ? "" : path).toString();
+    name = (typeof name === "undefined" ? "" : name).toString();
 
     const localizationKey = options.localize ? this.currentLocalization : "default";
 
@@ -105,7 +105,34 @@ class EditStore {
     )
   }
 
+  AppendListValue(objectId, path, value, options={}) {
+    let list = this.Value(objectId, path, "", options);
+    if(!list) {
+      this.SetValue(objectId, path, "", [], options);
+      list = [];
+    }
+
+    const index = list.length.toString();
+
+    this.SetValue(objectId, path, index, value, options);
+
+    return index;
+  }
+
+  SwapListValue(objectId, path, i1, i2, options={}) {
+    let list = this.Value(objectId, path, "", options);
+
+    if(!list) { return; }
+
+    const item1 = list[i1];
+    this.SetValue(objectId, path, i1, list[i2], options);
+    this.SetValue(objectId, path, i2, item1, options);
+  }
+
   RemoveValue(objectId, path, name, options) {
+    path = (typeof path === "undefined" ? "" : path).toString();
+    name = (typeof name === "undefined" ? "" : name).toString();
+
     const root = this.Value(objectId, path, undefined, options) || {};
 
     if(Array.isArray(root)) {

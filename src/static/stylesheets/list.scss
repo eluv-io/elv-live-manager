@@ -29,11 +29,15 @@
 .detail-list {
   display: flex;
   flex-direction: column;
+  max-width: 1200px;
   width: 100%;
 
   &__empty {
-    padding: 50px 0 30px;
-    text-align: center;
+    color: $mediumestgray;
+    font-size: 18px;
+    font-weight: 300;
+    padding: 50px 0 30px 20px;
+    user-select: none;
   }
 
   &__item,

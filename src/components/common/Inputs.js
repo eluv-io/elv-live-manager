@@ -3,7 +3,7 @@ import {observer} from "mobx-react";
 import {editStore} from "Stores";
 import ImageIcon, {IconButton} from "Components/common/ImageIcon";
 
-import {SafeTraverse} from "Utils/Misc";
+import {GenerateUUID, SafeTraverse} from "Utils/Misc";
 import ToolTip from "Components/common/ToolTip";
 import {FileBrowserModal} from "Components/common/FileBrowser";
 import {ImageExtensions} from "Utils/Files";
@@ -11,7 +11,6 @@ import UrlJoin from "url-join";
 import ImagePreview from "Components/common/ImagePreview";
 import {ContentBrowserModal} from "Components/common/ContentBrowser";
 import Utils from "@eluvio/elv-client-js/src/Utils";
-import {v4 as UUID, parse as UUIDParse} from "uuid";
 import EluvioPlayer, {EluvioPlayerParameters} from "@eluvio/elv-player-js";
 import Confirm from "Components/common/Confirm";
 import {DateTimePicker} from "@material-ui/pickers";
@@ -130,7 +129,7 @@ export const EditField = observer((props) => {
 
   useEffect(() => {
     if(props.uuid && !value) {
-      UpdateValue(props, Utils.B58(UUIDParse(UUID())));
+      UpdateValue(props, GenerateUUID());
     }
   }, []);
 

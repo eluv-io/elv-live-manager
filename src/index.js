@@ -19,6 +19,7 @@ import TopNavigation from "./components/navigation/TopNavigation";
 import Events from "Components/events";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import LuxonUtils from "@date-io/luxon";
+import Breadcrumbs from "Components/navigation/Breadcrumbs";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 

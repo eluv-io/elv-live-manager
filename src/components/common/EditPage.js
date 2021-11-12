@@ -3,11 +3,12 @@ import {editStore} from "Stores";
 import LanguageCodes from "Utils/LanguageCodes";
 import {observer} from "mobx-react";
 import {ErrorBoundary} from "Components/common/ErrorBoundary";
+import Breadcrumbs from "Components/navigation/Breadcrumbs";
+import {SetFramePath} from "Utils/Misc";
 
 // Page container with localization selection
 const EditPage = observer(({objectId, header, children, className=""}) => {
-  //const availableLocalizations = editStore.Value(objectId, "info", "localizations") || [];
-  const availableLocalizations = ["fr"];
+  const availableLocalizations = editStore.Value(objectId, "info", "localizations") || [];
 
   useEffect(() => {
     if(!availableLocalizations.includes(editStore.currentLocalization)) {
@@ -17,6 +18,7 @@ const EditPage = observer(({objectId, header, children, className=""}) => {
 
   return (
     <ErrorBoundary key={`edit-page-${header}`}>
+      <SetFramePath />
       <div className={`page-content edit-page ${className}`}>
         <div className="edit-page__header">
           <h2 className="edit-page__header__text">{ header } {editStore.currentLocalization === "default" ? "" : ` - ${LanguageCodes[editStore.currentLocalization]} Localization`}</h2>
@@ -36,6 +38,7 @@ const EditPage = observer(({objectId, header, children, className=""}) => {
               </select> : null
           }
         </div>
+        <Breadcrumbs />
         { children }
       </div>
     </ErrorBoundary>

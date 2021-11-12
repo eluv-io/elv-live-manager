@@ -14,6 +14,8 @@ class RootStore {
   address = undefined;
   networkInfo = undefined;
 
+  navigationBreadcrumbs = [];
+
   constructor() {
     makeAutoObservable(this);
 
@@ -31,6 +33,10 @@ class RootStore {
 
     yield this.contentStore.Initialize();
   });
+
+  SetNavigationBreadcrumbs(breadcrumbs) {
+    this.navigationBreadcrumbs = breadcrumbs || [];
+  }
 }
 
 export const rootStore = new RootStore();
