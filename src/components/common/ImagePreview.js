@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {observer} from "mobx-preact";
+import {observer} from "mobx-react";
 import {editStore} from "Stores";
 import UrlJoin from "url-join";
 import ToolTip from "Components/common/ToolTip";

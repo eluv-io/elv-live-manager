@@ -1,7 +1,7 @@
 import React from "react";
 import UrlJoin from "url-join";
 import {NavLink, useRouteMatch} from "react-router-dom";
-import {observer} from "mobx-preact";
+import {observer} from "mobx-react";
 import {editStore} from "Stores";
 
 const EventNavigation = observer(() => {
@@ -11,8 +11,6 @@ const EventNavigation = observer(() => {
     return null;
   }
 
-  const eventType = editStore.Value(match.params.eventId, "info", "type");
-  const eventLoaded = editStore.originalMetadata[match.params.eventId];
   const basePath = UrlJoin("/events", match.params.eventId);
 
   return (
@@ -25,13 +23,9 @@ const EventNavigation = observer(() => {
       <NavLink className="navigation__link" to={UrlJoin(basePath, "info")}>Info Cards</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "footer")}>Footer</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "social")}>Sponsors and Social</NavLink>
+      <NavLink className="navigation__link" to={UrlJoin(basePath, "tickets")}>Tickets</NavLink>
+      <NavLink className="navigation__link" to={UrlJoin(basePath, "drops")}>Drops</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "search")}>Search and Analytics</NavLink>
-      {
-        !eventLoaded ? null :
-          eventType === "drop_event" ?
-            <NavLink className="navigation__link" to={UrlJoin(basePath, "drops")}>Drops</NavLink> :
-            <NavLink className="navigation__link" to={UrlJoin(basePath, "tickets")}>Tickets and Products</NavLink>
-      }
     </div>
   );
 });

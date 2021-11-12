@@ -1,7 +1,7 @@
 .actions-container {
   align-items: center;
   display: flex;
-  padding: 20px 0;
+  padding: 10px 0;
   width: 100%;
 
   .action {
@@ -14,6 +14,7 @@
 .action {
   border-radius: 3px;
   cursor: pointer;
+  font-size: 14px;
   height: 35px;
   min-width: 130px;
   padding: 8px 20px;
@@ -59,15 +60,28 @@
   &-secondary {
     border: 1px solid $mediumgray;
     color: $black;
+
+    &:hover {
+      border-color: $darkgray;
+    }
   }
 }
 
 .action-input {
-  border: 1px solid $mediumgray;
   height: 35px;
   max-width: 400px;
   padding: 5px 10px;
   width: 100%;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid $mediumgray;
+
+  &:hover {
+    border: 1px solid $darkgray;
+  }
 }
 
 select {
@@ -89,14 +103,8 @@ select {
 }
 
 input {
-  border: 1px solid $mediumgray;
-
-  &[type="text"],
-  &:not([type]) {
-    border: 1px solid $mediumgray;
-    height: 35px;
-    padding: 5px 10px;
-  }
+  height: 35px;
+  padding: 5px 10px;
 
   &[type="checkbox"] {
     cursor: pointer;
@@ -105,15 +113,36 @@ input {
     padding: 0;
     width: 20px;
   }
+
+  &:read-only {
+    border: 0;
+    opacity: 0.75;
+  }
+}
+
+textarea {
+  min-height: 10em;
+  padding: 5px 10px;
+  resize: both;
 }
 
 .labelled-field {
   align-items: flex-start;
-  border-bottom: 1px solid $lightergray;
   display: flex;
   margin-bottom: 10px;
   min-height: 45px;
+  min-width: 700px;
   width: min-content;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid $lightergray;
+  }
+
+  &:hover {
+    label {
+      color: $black;
+    }
+  }
 
   label {
     align-items: center;
@@ -139,7 +168,7 @@ input {
     width: 30px;
 
     * {
-      stroke: $gold;
+      stroke: $mediumergray;
     }
   }
 
@@ -166,6 +195,65 @@ input {
   textarea,
   select {
     min-width: 400px;
+  }
+
+  textarea {
+    margin-bottom: 10px;
+  }
+
+  .currency-input {
+    align-items: center;
+    display: flex;
+    max-width: 400px;
+    width: 100%;
+
+    &__symbol {
+      padding-right: 5px;
+    }
+
+    input {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+
+
+  // sass-lint:disable class-name-format
+  // Material UI changes
+  .MuiFormControl-root {
+    * {
+      box-sizing: border-box;
+    }
+
+    .action {
+      padding: 0;
+    }
+  }
+
+  .MuiInputBase-root {
+    margin: 0;
+  }
+
+  .MuiInputLabel-root {
+    display: none;
+  }
+
+  .MuiInput-underline {
+    &::after {
+      display: none;
+    }
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .MuiInputBase-input {
+    cursor: pointer;
+    max-height: 35px;
+    min-height: 35px;
+    opacity: 1;
+    padding: 5px 10px;
   }
 }
 
@@ -201,6 +289,8 @@ input {
       }
 
       &:hover {
+        border: 1px solid $darkgray;
+
         * {
           stroke: $blue;
         }
@@ -214,19 +304,20 @@ input {
 }
 
 .link-selection {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   min-width: 400px;
   width: 500px;
 
-  &__select-button {
-    font-size: 12px;
-    height: 35px;
-    min-width: 100px;
-    padding: 0 10px;
+  .labelled-field {
+    border: 0;
+    min-width: 0;
+  }
 
-    &:not(:first-child) {
-      margin-top: 10px;
-    }
+  &__select-button {
+    font-size: 14px;
+    height: 35px;
+    min-width: 220px;
+    padding: 0 15px;
   }
 
   &__selected {
@@ -244,13 +335,6 @@ input {
     flex: 1 1 100%;
     font-size: 14px;
     font-weight: 300;
-  }
-
-  &__selected__icon {
-    height: 25px;
-    margin: 0 10px 0 5px;
-    min-width: 25px;
-    padding: 0;
   }
 
   &__selected__remove {
@@ -276,9 +360,21 @@ input {
     }
   }
 
+  &__selected__icon {
+    height: 25px;
+    margin: 0 10px 0 5px;
+    min-width: 25px;
+    padding: 0;
+
+    &-active {
+      * {
+        stroke: $blue;
+      }
+    }
+  }
+
   &__selected__labelled-field,
   &__alt-text__labelled-field {
-
     label {
       min-width: 100px;
       width: 100px;
@@ -291,6 +387,7 @@ input {
 
   &__video-preview {
     height: 280px;
+    margin-bottom: 10px;
     max-height: 280px;
     min-width: 500px;
     width: 500px;

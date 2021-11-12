@@ -10,9 +10,15 @@ events:
     (if accessed from the featured sites on the main page) or
 
     https://live.eluv.io/<tenant-slug>/<event-slug>
+  ticket_external_url: If this ticket is intended to be purchased on a different site, specify it here. This ticket SKU will not be purchasable on Eluvio LIVE.
+  ticket_hidden: If selected, this ticket will not be shown and will not be purchasable. Tickets of this type may still be redeemed.
+  ticket_requires_shipping: If specified, shipping information will be collected when this ticket type is purchased. Use this for cases like ticket + merchandise bundles.
+  ticket_release_date: If specified, the ticket will not be purchasable until this time.
+  ticket_start_time_text: This will be displayed in locations where time zone localization is not possible, such as emails.
 
 misc:
-  alt-text: This text helps screen-reading tools describe images to visually impaired readers and allows search engines to better crawl and rank your website.
+  alt-text: This text helps screen-reading tools describe images to visually impaired readers and allows search engines to better crawl and rank your site.
+  currencies: List of currencies that will be accepted for ticket purchases.
   localizations: |
     Select the languages / locales you would like the site to be available in.
 

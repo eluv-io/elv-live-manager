@@ -1,47 +1,39 @@
-import React, {useEffect, useState} from "react";
-import {Redirect, withRouter} from "react-router-dom";
+import React from "react";
 
-const ErrorBoundary = withRouter(({location, match, redirectOnError, To, hideOnError, children, className=""}) => {
-  const [oldLocation, setOldLocation] = useState(location);
-  const [error, setError] = useState(undefined);
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
 
-  useEffect(() => {
-    if(oldLocation.pathname !== location.pathname) {
-      setError(undefined);
-    }
+    this.state = {
+      error: undefined
+    };
+  }
 
-    setOldLocation(location);
-  });
+  componentDidCatch(error) {
+    console.error(error);
+    this.setState({error});
+  }
 
-  try {
-    if(error) {
-      if(redirectOnError) {
-        return <Redirect to={To(match)}/>;
-      }
-
-      if(hideOnError) {
+  render() {
+    if(this.state.error) {
+      if(this.props.hideOnError) {
         return null;
       }
 
       return (
-        <div className={`error-section ${className}`}>
+        <div className={`error-container ${this.props.className || ""}`}>
           We're sorry, something went wrong
         </div>
       );
     }
 
-    return children;
-  } catch(error) {
-    console.error(error);
-    setError(error);
-
-    return null;
+    return this.props.children;
   }
-});
+}
 
 const ErrorWrapper = Component => (
   props =>
-    <ErrorBoundary>
+    <ErrorBoundary className={props._errorBoundaryClassname}>
       <Component {...props} />
     </ErrorBoundary>
 );

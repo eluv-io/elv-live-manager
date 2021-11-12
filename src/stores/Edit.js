@@ -23,6 +23,10 @@ class EditStore {
     return this.rootStore.client;
   }
 
+  Currencies(eventId) {
+    return this.Value(eventId, "info", "payment_currencies") || ["USD"];
+  }
+
   constructor(rootStore) {
     makeAutoObservable(this);
 
@@ -43,9 +47,21 @@ class EditStore {
       versionHash,
       metadataSubtree: path || "/public/asset_metadata"
     });
+    this.updatedMetadata[objectId] = {
+      default: this.originalMetadata[objectId]
+    };
   });
 
-  // TODO: Option for no localize
+  InitializeValue(objectId, path, name) {
+    const currentValue = SafeTraverse((this.updatedMetadata[objectId] || {})["default"], UrlJoin(path || "", name || ""));
+
+    if(typeof currentValue !== "undefined") {
+      return;
+    }
+
+    this.SetValue(objectId, path, name, SafeTraverse((this.originalMetadata[objectId] || {}), UrlJoin(path || "", name || "")));
+  }
+
   Value(objectId, path, name, options={}) {
     const localizationKey = options.localize ? this.currentLocalization : "default";
 
@@ -58,11 +74,17 @@ class EditStore {
     if(localizationKey === "default") {
       return SafeTraverse((this.originalMetadata[objectId] || {}), UrlJoin(path || "", name || ""));
     } else {
-      return SafeTraverse((this.originalMetadata[objectId] || {}), UrlJoin("localizations", localizationKey, path || "", name || ""));
+      return (
+        SafeTraverse((this.originalMetadata[objectId] || {}), UrlJoin("localizations", localizationKey, path || "", name || "")) ||
+        SafeTraverse((this.originalMetadata[objectId] || {}), UrlJoin(path || "", name || ""))
+      );
     }
   }
 
   SetValue(objectId, path, name, value, options={}) {
+    path = path || "";
+    name = name || "";
+
     const localizationKey = options.localize ? this.currentLocalization : "default";
 
     SafeSet(
@@ -81,6 +103,34 @@ class EditStore {
       { objectId, path: UrlJoin(path, name), value, localization: localizationKey },
       [ objectId, this.currentLocalization, UrlJoin(path, name) ]
     )
+  }
+
+  RemoveValue(objectId, path, name, options) {
+    const root = this.Value(objectId, path, undefined, options) || {};
+
+    if(Array.isArray(root)) {
+      // Remove item at array index
+      this.SetValue(
+        objectId,
+        path,
+        undefined,
+        root.filter((_, index) => index.toString() !== name.toString()),
+        options
+      );
+    } else if(typeof root === "object") {
+      // Remove object key
+
+      const newRoot = { ...root };
+      delete newRoot[name];
+
+      this.SetValue(
+        objectId,
+        path,
+        undefined,
+        newRoot,
+        options
+      );
+    }
   }
 
   async BaseUrl({objectId}) {

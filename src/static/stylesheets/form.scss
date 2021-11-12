@@ -1,6 +1,11 @@
 .form {
   &__section {
-    padding: 10px 0;
+    margin-bottom: 20px;
+    padding: 10px 0 40px;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $lightgray;
+    }
   }
 
   &__section__header {

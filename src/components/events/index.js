@@ -1,6 +1,6 @@
 import React from "react";
 import {NavLink, Redirect, Route, Switch, useRouteMatch} from "react-router-dom";
-import {observer} from "mobx-preact";
+import {observer} from "mobx-react";
 import EventNavigation from "Components/events/Navigation";
 import {contentStore, editStore} from "Stores";
 import UrlJoin from "url-join";
@@ -15,6 +15,7 @@ import AsyncComponent from "Components/common/AsyncComponent";
 import BasicInfo from "Components/events/pages/BasicInfo";
 import MainPage from "Components/events/pages/MainPage";
 import {set} from "mobx";
+import {TicketClass, Tickets, TicketSku} from "Components/events/pages/Tickets";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -61,7 +62,7 @@ const EventPage = observer(({children, Render}) => {
             await editStore.LoadMetadata({objectId: match.params.eventId});
           }}
         >
-          <EditPage header={event ? editStore.Value(match.params.eventId, "", "display_title") || event.name : "Events"}>
+          <EditPage objectId={match.params.eventId} header={event ? editStore.Value(match.params.eventId, "", "display_title") || event.name : "Events"}>
             { Render ? Render() : children }
           </EditPage>
         </AsyncComponent>
@@ -125,7 +126,17 @@ const Events = () => {
       </Route>
       <Route exact path="/events/:eventId/tickets">
         <EventPage>
-          <Placeholder text="Tickets" />
+          <Tickets />
+        </EventPage>
+      </Route>
+      <Route exact path="/events/:eventId/tickets/:ticketClassId">
+        <EventPage>
+          <TicketClass />
+        </EventPage>
+      </Route>
+      <Route exact path="/events/:eventId/tickets/:ticketClassId/:ticketSKUId">
+        <EventPage>
+          <TicketSku />
         </EventPage>
       </Route>
       <Route path="*">

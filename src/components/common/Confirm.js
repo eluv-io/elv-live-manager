@@ -1,10 +1,17 @@
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {render, unmountComponentAtNode} from "react-dom";
 import Modal from "Components/common/Modal";
 import {Loader} from "Components/common/Loader";
 
 const ConfirmModal = ({message, Confirm, Close}) => {
   const [confirming, setConfirming] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if(ref.current) {
+      ref.current.focus();
+    }
+  }, [ref]);
 
   return (
     <Modal className="confirm-modal" Close={Close}>
@@ -29,7 +36,7 @@ const ConfirmModal = ({message, Confirm, Close}) => {
                 >
                   Confirm
                 </button>
-                <button className="action action-secondary" onClick={Close}>
+                <button className="action action-secondary" onClick={Close} ref={ref} >
                   Cancel
                 </button>
               </>

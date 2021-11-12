@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import UrlJoin from "url-join";
 import {filesStore} from "Stores";
-import {observer} from "mobx-preact";
+import {observer} from "mobx-react";
 import AsyncComponent from "Components/common/AsyncComponent";
 import PrettyBytes from "pretty-bytes";
 import Modal from "Components/common/Modal";

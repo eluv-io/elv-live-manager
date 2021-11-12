@@ -71,13 +71,6 @@ module.exports = {
       Utils: Path.resolve(__dirname, "src/utils"),
       // Force webpack to use *one* copy of bn.js instead of 8
       "bn.js": Path.resolve(Path.join(__dirname, "node_modules", "bn.js")),
-      "react": "preact/compat",
-      "react-dom": "preact/compat",
-
-      // Not necessary unless you consume a module using `createClass`
-      'create-react-class': 'preact-compat/lib/create-react-class',
-      // Not necessary unless you consume a module requiring `react-dom-factories`
-      'react-dom-factories': 'preact-compat/lib/react-dom-factories',
       "@eluvio/elv-client-js$": "@eluvio/elv-client-js/dist/ElvClient-min.js"
     },
     extensions: [".js", ".jsx", ".scss", ".png", ".svg"],

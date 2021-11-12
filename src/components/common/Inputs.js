@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
-import {observer} from "mobx-preact";
-import {contentStore, editStore} from "Stores";
+import {observer} from "mobx-react";
+import {editStore} from "Stores";
 import ImageIcon, {IconButton} from "Components/common/ImageIcon";
 
 import {SafeTraverse} from "Utils/Misc";
@@ -11,18 +11,26 @@ import UrlJoin from "url-join";
 import ImagePreview from "Components/common/ImagePreview";
 import {ContentBrowserModal} from "Components/common/ContentBrowser";
 import Utils from "@eluvio/elv-client-js/src/Utils";
+import {v4 as UUID, parse as UUIDParse} from "uuid";
+import EluvioPlayer, {EluvioPlayerParameters} from "@eluvio/elv-player-js";
+import Confirm from "Components/common/Confirm";
+import {DateTimePicker} from "@material-ui/pickers";
 
 import Hints from "Assets/documentation/InputHints.yaml";
 
 import HintIcon from "Assets/icons/help-square.svg";
 import FileIcon from "Assets/icons/file.svg";
-import DirectoryIcon from "Assets/icons/directory.svg";
 import PictureIcon from "Assets/icons/image.svg";
 import AddIcon from "Assets/icons/plus.svg";
 import RemoveIcon from "Assets/icons/x.svg";
 import PlayIcon from "Assets/icons/play-circle.svg";
-import EluvioPlayer, {EluvioPlayerParameters} from "@eluvio/elv-player-js";
 
+const Validations = {
+  NAN: (value) => isNaN(value) ? 0 : value,
+  Numeric: (value) => (value || "").toString().replace(/[^0-9\.]+/g, ""),
+  Number: (fixed) => (value) => Validations.NAN(fixed ? parseFloat(parseFloat(Validations.Numeric(value)).toFixed(fixed)) : parseFloat(Validations.Numeric(value))),
+  Integer: (value) => Validations.NAN(parseInt(Validations.Numeric(value)))
+};
 
 export const LabelledField = observer(({name, label, hint, children, className=""}) => {
   if(hint) {
@@ -52,36 +60,83 @@ export const LabelledField = observer(({name, label, hint, children, className="
 });
 
 const UpdateValue = (props, eventOrValue) => {
-  const path = typeof props.path === "undefined" ? "info" : props.path;
+  try {
+    const path = typeof props.path === "undefined" ? "info" : props.path;
 
-  let value = eventOrValue;
-  if(eventOrValue && eventOrValue.target) {
-    switch(eventOrValue.target.type) {
-      case "checkbox":
-        value = eventOrValue.target.checked;
-        break;
-      default:
-        value = eventOrValue.target.value;
+    let value = eventOrValue;
+    if(eventOrValue && eventOrValue.target) {
+      switch(eventOrValue.target.type) {
+        case "checkbox":
+          value = eventOrValue.target.checked;
+          break;
+        default:
+          value = eventOrValue.target.value;
+      }
     }
-  }
 
-  editStore.SetValue(props.objectId, path, props.name, value, {localize: props.localize});
+    if(props.number || props.integer) {
+      value = Validations.Numeric(value);
+    }
+
+    editStore.SetValue(props.objectId, path, props.name, value, {localize: props.localize});
+  } catch(error) {
+    console.error(`Failed to update value ${props.name}`);
+    console.error(error);
+  }
 };
 
-const FilterProps = props => {
+const FormatProps = props => {
   let filteredProps = { ...props };
+
+  filteredProps.autoComplete = "off";
+  filteredProps["data-lpignore"] = "true";
+
+  if(props.number) {
+    filteredProps.inputMode = "decimal";
+  }
+
+  if(props.integer) {
+    filteredProps.inputMode = "numeric";
+  }
+
+  if(props.url) {
+    filteredProps.inputMode = "url";
+  }
 
   delete filteredProps.objectId;
   delete filteredProps.path;
   delete filteredProps.localize;
   delete filteredProps.hint;
+  delete filteredProps.uuid;
+  delete filteredProps.validations;
+  delete filteredProps.Render;
+
+  // Types
+  delete filteredProps.datetime;
+  delete filteredProps.number;
+  delete filteredProps.digits;
+  delete filteredProps.integer;
+  delete filteredProps.image;
+  delete filteredProps.url;
 
   return filteredProps;
 };
 
 export const EditField = observer((props) => {
   const path = typeof props.path === "undefined" ? "info" : props.path;
-  const value = editStore.Value(props.objectId, path, props.name, {localize: props.localize});
+  let value = editStore.Value(props.objectId, path, props.name, {localize: props.localize}) || null;
+
+  value = props.datetime ? value : value || "";
+
+  useEffect(() => {
+    if(props.uuid && !value) {
+      UpdateValue(props, Utils.B58(UUIDParse(UUID())));
+    }
+  }, []);
+
+  if(!props.localize && editStore.currentLocalization !== "default") {
+    return null;
+  }
 
   if(props.dependsOn) {
     const dependantValue = editStore.Value(props.objectId, props.dependsOn, "", {localize: props.localize});
@@ -91,20 +146,56 @@ export const EditField = observer((props) => {
     }
   }
 
-  const field = (
-    React.cloneElement(
-      props.children,
-      FilterProps({
+  if(props.hideIf) {
+    const dependantValue = editStore.Value(props.objectId, props.hideIf, "", {localize: props.localize});
+
+    if(dependantValue) {
+      return null;
+    }
+  }
+
+  let field;
+  if(props.Render) {
+    // Render passed, render with props
+    field = props.Render(
+      FormatProps({
         ...props,
         id: props.name,
         key: `${props.key || "edit-field"}-${editStore.currentLocalization}`,
-        children: undefined,
         value,
         checked: props.type === "checkbox" ? value : undefined,
         onChange: eventOrValue => UpdateValue(props, eventOrValue)
       })
-    )
-  );
+    );
+  } else {
+    // Child passed - clone and inject props
+    field = (
+      React.cloneElement(
+        props.children,
+        FormatProps({
+          ...props,
+          id: props.name,
+          key: `${props.key || "edit-field"}-${editStore.currentLocalization}`,
+          children: undefined,
+          value,
+          checked: props.type === "checkbox" ? value : undefined,
+          onChange: eventOrValue => UpdateValue(props, eventOrValue),
+          onBlur: () => {
+            // When user leaves the field after editing
+
+            if(props.number) {
+              // If numeric, validate number and trim to specified digits
+              UpdateValue(props, Validations.Number(props.digits)(value));
+            }
+
+            if(props.integer) {
+              UpdateValue(props, Validations.Integer(value));
+            }
+          }
+        })
+      )
+    );
+  }
 
   if(!props.label) {
     return field;
@@ -117,33 +208,6 @@ export const EditField = observer((props) => {
   );
 });
 
-export const EditProps = observer(props => {
-  const path = typeof props.path === "undefined" ? "info" : props.path;
-  const value = editStore.Value(props.objectId, path, props.name, {localize: props.localize});
-
-  const field = (
-    props.Render(
-      FilterProps({
-        ...props,
-        id: props.name,
-        key: `${props.key || "edit-field"}-${editStore.currentLocalization}`,
-        value: editStore.Value(props.objectId, path, props.name, {localize: props.localize}),
-        checked: props.type === "checkbox" ? value : undefined,
-        onChange: eventOrValue => UpdateValue(props, eventOrValue)
-      })
-    )
-  );
-
-  if(!props.label) {
-    return field;
-  }
-
-  return (
-    <LabelledField name={props.name} label={props.label} hint={props.hint} className={props.className ? `${props.className}__labelled-field` : ""}>
-      { field }
-    </LabelledField>
-  );
-});
 
 export const Input = (props) => {
   return (
@@ -163,7 +227,7 @@ export const TextArea = (props) => {
 
 export const Select = (props) => {
   return (
-    <EditProps
+    <EditField
       {...props}
       Render={newProps => (
         <select {...newProps}>
@@ -174,6 +238,78 @@ export const Select = (props) => {
   );
 };
 
+export const DateTime = (props) => {
+  return (
+    <EditField {...props} datetime>
+      <DateTimePicker
+        format="DDDD        H:mm ZZZZ"
+        placeholder="No Date Selected"
+        InputProps={{
+          endAdornment: (
+            <IconButton
+              icon={RemoveIcon}
+              onClick={event => {
+                event.stopPropagation();
+                UpdateValue(props, null);
+              }}
+            />
+          )
+        }}
+      />
+    </EditField>
+  );
+};
+
+export const Price = observer((props) => {
+  if(!props.localize && editStore.currentLocalization !== "default") {
+    return null;
+  }
+
+  return (
+    editStore.Currencies(props.objectId).map(currency => {
+      let symbol;
+      try {
+        const currentLocale = (navigator.languages && navigator.languages.length) ? navigator.languages[0] : navigator.language;
+        symbol = new Intl.NumberFormat(currentLocale || "en-US", {style: "currency", currency})
+          .formatToParts(0)
+          .find(part => part.type === "currency")
+          .value;
+      } catch(error) {
+        console.error(`Failed to determine currency symbol for ${currency}`);
+      }
+
+      return (
+        <EditField
+          {...props}
+          label={undefined}
+          Render={() =>
+            <LabelledField label={`Price (${currency})`} name={props.name} hint={props.hint} key={`price-${currency}`}>
+              <div className="input currency-input">
+                <span className="currency-input__symbol">{ symbol }</span>
+                <Input
+                  {...props}
+                  label={undefined}
+                  number
+                  digits={2}
+                  path={UrlJoin(props.path, "price")}
+                  name={currency}
+                />
+              </div>
+            </LabelledField>
+          }
+        />
+      );
+    })
+  );
+});
+
+export const Form = (props) => {
+  return (
+    <form onSubmit={event => event.preventDefault()} autoComplete="off" aria-autocomplete="none" aria-roledescription="form" className="form" {...props}>
+      { props.children }
+    </form>
+  );
+};
 
 const MultiSelectComponent = ({name, values, buttonLabel, onChange, options, className=""}) => {
   values = values || [];
@@ -213,7 +349,7 @@ const MultiSelectComponent = ({name, values, buttonLabel, onChange, options, cla
         <div className="multiselect__selection" key={`-elv-multi-select-${name}-${index}`}>
           <select
             name={name}
-            value={selected}
+            value={selected || ""}
             onChange={event => Update(index, event)}
           >
             {options.map(option => {
@@ -249,7 +385,7 @@ const MultiSelectComponent = ({name, values, buttonLabel, onChange, options, cla
 
 export const MultiSelect = (props) => {
   return (
-    <EditProps
+    <EditField
       {...props}
       Render={newProps => (
         <MultiSelectComponent {...newProps} values={newProps.value}>
@@ -324,7 +460,12 @@ export const FileInput = observer((props) => {
                   className="link-selection__icon link-selection__selected__remove"
                   icon={RemoveIcon}
                   title={`Remove '${props.label || props.name}'`}
-                  onClick={() => editStore.SetValue(props.objectId, path, props.name, null, {localize: true})}
+                  onClick={async () => {
+                    await Confirm({
+                      message: `Are you sure you want to remove '${props.label || props.name}'?`,
+                      Confirm: () => editStore.SetValue(props.objectId, path, props.name, null, {localize: true})
+                    });
+                  }}
                 />
               </div>
             </LabelledField> : null
@@ -450,7 +591,7 @@ export const ContentInput = observer((props) => {
                         setPlayer(undefined);
                         setShowPreview(!showPreview);
                       }}
-                      className="link-selection__icon link-selection__selected__icon"
+                      className={`link-selection__icon link-selection__selected__icon ${showPreview ? "link-selection__selected__icon-active" : ""}`}
                       icon={PlayIcon}
                       alt="File"
                     /> :
@@ -467,7 +608,19 @@ export const ContentInput = observer((props) => {
                   className="link-selection__icon link-selection__selected__remove"
                   icon={RemoveIcon}
                   title={`Remove '${props.label || props.name}'`}
-                  onClick={() => editStore.SetValue(props.objectId, path, props.name, null, {localize: true})}
+                  onClick={async () => {
+                    await Confirm({
+                      message: `Are you sure you want to remove '${props.label || props.name}'?`,
+                      Confirm: () => {
+                        if(player) { player.Destroy(); }
+
+                        setPlayer(undefined);
+                        setShowPreview(false);
+
+                        editStore.SetValue(props.objectId, path, props.name, null, {localize: true});
+                      }
+                    });
+                  }}
                 />
               </div>
             </LabelledField> : null
@@ -477,7 +630,6 @@ export const ContentInput = observer((props) => {
           showPreview ?
             <div
               ref={element => {
-                console.log(element, player);
                 if(!element || player) { return; }
 
                 setPlayer(

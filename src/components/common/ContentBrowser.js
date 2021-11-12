@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import Modal from "Components/common/Modal";
 import AsyncComponent from "Components/common/AsyncComponent";
 import {contentStore} from "Stores";
-import {observer} from "mobx-preact";
+import {observer} from "mobx-react";
 
 import SearchIcon from "Assets/icons/search.svg";
 import ImageIcon from "Components/common/ImageIcon";

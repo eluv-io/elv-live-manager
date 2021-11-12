@@ -1,5 +1,5 @@
 import React from "react";
-import {observer} from "mobx-preact";
+import {observer} from "mobx-react";
 import {editStore} from "Stores";
 import {Input} from "Components/common/Inputs";
 

@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {PageLoader} from "Components/common/Loader";
-import {observer} from "mobx-preact";
+import {observer} from "mobx-react";
 
 const AsyncComponent = observer(({loaded, Load, children, Render, className=""}) => {
   const [isLoaded, setLoaded] = useState(loaded);

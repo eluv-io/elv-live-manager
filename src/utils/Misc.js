@@ -1,6 +1,6 @@
 import {useRouteMatch} from "react-router-dom";
 import {useEffect} from "react";
-import {rootStore} from "Stores";
+import {editStore, rootStore} from "Stores";
 
 export const LogMessage = message => {
   console.log(message);
@@ -22,6 +22,21 @@ export const onEnterPressed = (fn) => {
 
     fn(event);
   };
+};
+
+export const FormatPriceString = (price, currency, trimZeros) => {
+  trimZeros=false;
+
+  if(!price || isNaN(price)) { return; }
+
+  const currentLocale = (navigator.languages && navigator.languages.length) ? navigator.languages[0] : navigator.language;
+  let formattedPrice = new Intl.NumberFormat(currentLocale || "en-US", { style: "currency", currency }).format(price);
+
+  if(trimZeros && formattedPrice.endsWith(".00")) {
+    formattedPrice = formattedPrice.slice(0, -3);
+  }
+
+  return formattedPrice;
 };
 
 export const SafeTraverse = (object, ...keys) => {
@@ -58,6 +73,8 @@ export const SafeSet = (object, value, ...keys) => {
     keys = keys[0].split("/").filter(element => element);
   }
 
+  keys = keys.filter(key => key);
+
   let pointer = object;
   keys.forEach((key, index) => {
     if(index === keys.length - 1) {
@@ -71,8 +88,6 @@ export const SafeSet = (object, value, ...keys) => {
 };
 
 export const SetFramePath = () => {
-  return null;
-
   const match = useRouteMatch();
 
   useEffect(() => {

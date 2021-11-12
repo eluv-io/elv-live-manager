@@ -25,3 +25,55 @@
     }
   }
 }
+
+.detail-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &__empty {
+    padding: 50px 0 30px;
+    text-align: center;
+  }
+
+  &__item,
+  &__item-header {
+    align-items: center;
+    display: grid;
+    height: 50px;
+  }
+
+  &__item {
+    cursor: pointer;
+
+    &:focus,
+    &:hover {
+      background-color: $lightestgray;
+
+      .action {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__item-header {
+    font-weight: bold;
+  }
+
+  &__item__column {
+    @include ellipsis;
+    padding: 0 10px;
+  }
+
+  .action {
+    opacity: 0;
+
+    &:focus {
+      opacity: 1;
+    }
+  }
+
+  .center {
+    text-align: center;
+  }
+}

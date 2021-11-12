@@ -2,8 +2,10 @@ import "Assets/stylesheets/app.scss";
 
 import React from "react";
 import { render } from "react-dom";
-import { observer} from "mobx-preact";
+import { observer} from "mobx-react";
 import {rootStore} from "Stores";
+
+window.js = content => console.log(JSON.stringify(content, null, 2));
 
 import {
   HashRouter,
@@ -15,6 +17,8 @@ import ScrollToTop from "Components/common/ScrollToTop";
 import {ErrorBoundary} from "Components/common/ErrorBoundary";
 import TopNavigation from "./components/navigation/TopNavigation";
 import Events from "Components/events";
+import {MuiPickersUtilsProvider} from "@material-ui/pickers";
+import LuxonUtils from "@date-io/luxon";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -47,18 +51,19 @@ const Routes = () => {
 };
 
 const App = observer(() => {
-  console.log(rootStore.client);
   return (
-    <HashRouter>
-      <div className="app-container">
-        <TopNavigation />
-        <ScrollToTop>
-          <ErrorBoundary className="page-container">
-            <Routes />
-          </ErrorBoundary>
-        </ScrollToTop>
-      </div>
-    </HashRouter>
+    <MuiPickersUtilsProvider utils={LuxonUtils}>
+      <HashRouter>
+        <div className="app-container">
+          <TopNavigation />
+          <ScrollToTop>
+            <ErrorBoundary className="page-container">
+              <Routes />
+            </ErrorBoundary>
+          </ScrollToTop>
+        </div>
+      </HashRouter>
+    </MuiPickersUtilsProvider>
   );
 });
 
