@@ -67,36 +67,32 @@ export const TicketClass = observer(() => {
 
   return (
     <Form>
-      <div className="form__section">
-        <h2 className="form__section__header">
-          Ticket SKUs
-        </h2>
-        <DetailList
-          columnNames={["Name", "Start Time", "Price"]}
-          columnClasses={["", "", "center"]}
-          columnSizes="1fr 1fr 150px"
-          items={
-            (ticketClass.skus || []).map((ticketSku, ticketSkuIndex) => ({
-              link: UrlJoin("/events", objectId, "tickets", ticketClass.uuid, ticketSku.uuid),
-              values: [
-                editStore.Value(objectId, UrlJoin("info", "tickets", ticketClassIndex.toString(), "skus", ticketSkuIndex.toString()), "label", {localize: true}),
-                ticketSku.start_time ? luxon.DateTime.fromISO(ticketSku.start_time).toFormat("DDDD        H:mm ZZZZ") : "",
-                FormatPriceString((ticketSku.price || {})[defaultCurrency], defaultCurrency)
-              ]
-            }))
-          }
-          noItemsMessage="No Ticket SKUs Created"
-          createText="Create Ticket SKU"
-          Create={() => {
-            const ticketSku = TicketSKUSpec();
-            editStore.AppendListValue(objectId, UrlJoin(basePath, "skus"), ticketSku);
+      <DetailList
+        header="Ticket SKUs"
+        columnNames={["Name", "Start Time", "Price"]}
+        columnClasses={["", "", "center"]}
+        columnSizes="1fr 1fr 150px"
+        items={
+          (ticketClass.skus || []).map((ticketSku, ticketSkuIndex) => ({
+            link: UrlJoin("/events", objectId, "tickets", ticketClass.uuid, ticketSku.uuid),
+            values: [
+              editStore.Value(objectId, UrlJoin("info", "tickets", ticketClassIndex.toString(), "skus", ticketSkuIndex.toString()), "label", {localize: true}),
+              ticketSku.start_time ? luxon.DateTime.fromISO(ticketSku.start_time).toFormat("DDDD        H:mm ZZZZ") : "",
+              FormatPriceString((ticketSku.price || {})[defaultCurrency], defaultCurrency)
+            ]
+          }))
+        }
+        noItemsMessage="No Ticket SKUs Created"
+        createText="Create Ticket SKU"
+        Create={() => {
+          const ticketSku = TicketSKUSpec();
+          editStore.AppendListValue(objectId, UrlJoin(basePath, "skus"), ticketSku);
 
-            return UrlJoin("/events", objectId, "tickets", ticketClass.uuid, ticketSku.uuid);
-          }}
-          removeText={item => `Are you sure you want to remove ${item.values[0] || "this ticket sku"}?`}
-          Remove={async index => editStore.RemoveValue(objectId, UrlJoin("info", "tickets", ticketClassIndex.toString(), "skus"), index)}
-        />
-      </div>
+          return UrlJoin("/events", objectId, "tickets", ticketClass.uuid, ticketSku.uuid);
+        }}
+        removeText={item => `Are you sure you want to remove ${item.values[0] || "this ticket sku"}?`}
+        Remove={async index => editStore.RemoveValue(objectId, UrlJoin("info", "tickets", ticketClassIndex.toString(), "skus"), index)}
+      />
       <div className="form__section">
         <h2 className="form__section__header">
           Ticket Class: { ticketClass.name }
@@ -121,6 +117,7 @@ export const Tickets = observer(() => {
 
   return (
     <DetailList
+      header="Tickets"
       columnNames={["Name", "SKUs"]}
       columnClasses={["", "center"]}
       columnSizes="1fr 150px"

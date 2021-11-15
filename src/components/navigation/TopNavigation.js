@@ -5,7 +5,7 @@ import Logo from "Assets/images/logo.svg";
 
 const TopNavigation = () => {
   return (
-    <div className="navigation navigation-top">
+    <nav className="navigation navigation-top">
       <div className="navigation__logo-container">
         <ImageIcon icon={Logo} title="Eluvio" className="navigation__logo" />
       </div>
@@ -15,7 +15,7 @@ const TopNavigation = () => {
       <NavLink className="navigation__link" to="/marketplaces">Marketplaces</NavLink>
       <NavLink className="navigation__link" to="/nfts">NFTs</NavLink>
       <NavLink className="navigation__link" to="/media">Media</NavLink>
-    </div>
+    </nav>
   );
 };
 

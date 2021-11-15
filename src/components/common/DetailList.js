@@ -27,7 +27,7 @@ const DetailList = observer(
     const rowStyle = { gridTemplateColumns: columnSizes + " 50px" };
     return (
       <>
-        <h2 className="page-header">
+        <h2 className="detail-list__header">
           { header }
         </h2>
         <div className="actions-container">
@@ -35,7 +35,7 @@ const DetailList = observer(
         </div>
         {
           items.length === 0 ?
-            <div className="detail-list__empty">
+            <div className="detail-list detail-list__empty">
               { noItemsMessage }
             </div> :
             <div className="detail-list tickets-list">

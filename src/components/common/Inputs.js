@@ -109,6 +109,10 @@ const FormatProps = props => {
   delete filteredProps.uuid;
   delete filteredProps.validations;
   delete filteredProps.Render;
+  delete filteredProps.dependsOn;
+  delete filteredProps.hideIf;
+  delete filteredProps.only;
+  delete filteredProps.defaultValue;
 
   // Types
   delete filteredProps.datetime;
@@ -121,27 +125,12 @@ const FormatProps = props => {
   return filteredProps;
 };
 
-export const EditField = observer((props) => {
-  const path = typeof props.path === "undefined" ? "info" : props.path;
-  let value = editStore.Value(props.objectId, path, props.name, {localize: props.localize}) || null;
-
-  value = props.datetime ? value : value || "";
-
-  useEffect(() => {
-    if(props.uuid && !value) {
-      UpdateValue(props, GenerateUUID());
-    }
-  }, []);
-
-  if(!props.localize && editStore.currentLocalization !== "default") {
-    return null;
-  }
-
+const FieldHidden = props => {
   if(props.dependsOn) {
     const dependantValue = editStore.Value(props.objectId, props.dependsOn, "", {localize: props.localize});
 
     if(!dependantValue) {
-      return null;
+      return true;
     }
   }
 
@@ -149,8 +138,33 @@ export const EditField = observer((props) => {
     const dependantValue = editStore.Value(props.objectId, props.hideIf, "", {localize: props.localize});
 
     if(dependantValue) {
-      return null;
+      return true;
     }
+  }
+
+  if(props.only && !props.only()) {
+    return true;
+  }
+};
+
+export const EditField = observer((props) => {
+  const path = typeof props.path === "undefined" ? "info" : props.path;
+  let value = editStore.Value(props.objectId, path, props.name, {localize: props.localize});
+
+  value = props.datetime ? value || null : value;
+
+  useEffect(() => {
+    if(props.uuid && !value) {
+      UpdateValue(props, GenerateUUID());
+    }
+
+    if(props.default_value && typeof value === "undefined") {
+      UpdateValue(props, props.default_value);
+    }
+  }, []);
+
+  if(FieldHidden(props)) {
+    return null;
   }
 
   let field;
@@ -264,6 +278,10 @@ export const Price = observer((props) => {
     return null;
   }
 
+  if(FieldHidden(props)) {
+    return null;
+  }
+
   return (
     editStore.Currencies(props.objectId).map(currency => {
       let symbol;
@@ -278,25 +296,19 @@ export const Price = observer((props) => {
       }
 
       return (
-        <EditField
-          {...props}
-          label={undefined}
-          Render={() =>
-            <LabelledField label={`Price (${currency})`} name={props.name} hint={props.hint} key={`price-${currency}`}>
-              <div className="input currency-input">
-                <span className="currency-input__symbol">{ symbol }</span>
-                <Input
-                  {...props}
-                  label={undefined}
-                  number
-                  digits={2}
-                  path={UrlJoin(props.path, "price")}
-                  name={currency}
-                />
-              </div>
-            </LabelledField>
-          }
-        />
+        <LabelledField label={`Price (${currency})`} name={props.name} hint={props.hint} key={`price-${currency}`}>
+          <div className="input currency-input">
+            <span className="currency-input__symbol">{ symbol }</span>
+            <Input
+              {...props}
+              label={undefined}
+              number
+              digits={2}
+              path={UrlJoin(props.path, "price")}
+              name={currency}
+            />
+          </div>
+        </LabelledField>
       );
     })
   );
@@ -403,6 +415,10 @@ export const FileInput = observer((props) => {
   const selectedFile = ((value && value["/"]) || "").replace(/^\.\/files\//, "");
   const extension = selectedFile && (selectedFile.split(".").pop() || "").toLowerCase();
   const isImage = ImageExtensions.includes(extension);
+
+  if(FieldHidden(props)) {
+    return null;
+  }
 
   return (
     <LabelledField label={props.label || props.name} hint={props.hint}>
@@ -539,6 +555,10 @@ export const ContentInput = observer((props) => {
     }
   }, [selectedLink]);
 
+  if(FieldHidden(props)) {
+    return null;
+  }
+
   return (
     <LabelledField label={props.label || props.name} hint={props.hint}>
       <div className="link-selection content-input">
@@ -548,6 +568,11 @@ export const ContentInput = observer((props) => {
               header={`Select content for '${props.label || props.name}'`}
               requireVersion={props.requireVersion}
               Select={selection => {
+                if(player) { player.Destroy(); }
+
+                setPlayer(undefined);
+                setShowPreview(false);
+
                 setSelectionName(selection.name);
                 setSelectionPlayable(selection.playable);
 

@@ -17,6 +17,9 @@ import MainPage from "Components/events/pages/MainPage";
 import {set} from "mobx";
 import {TicketClass, Tickets, TicketSku} from "Components/events/pages/Tickets";
 import Breadcrumbs from "Components/navigation/Breadcrumbs";
+import SocialMedia from "Components/events/pages/SocialMedia";
+import {Sponsor, Sponsors} from "Components/events/pages/Sponsors";
+import {Footer, FooterLink} from "Components/events/pages/Footer";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -106,17 +109,27 @@ const Events = () => {
       </Route>
       <Route exact path="/events/:eventId/footer">
         <EventPage>
-          <Placeholder text="Footer" />
+          <Footer />
+        </EventPage>
+      </Route>
+      <Route exact path="/events/:eventId/footer/:footerLinkIndex">
+        <EventPage>
+          <FooterLink />
         </EventPage>
       </Route>
       <Route exact path="/events/:eventId/social">
         <EventPage>
-          <Placeholder text="Social" />
+          <SocialMedia />
         </EventPage>
       </Route>
       <Route exact path="/events/:eventId/sponsors">
         <EventPage>
-          <Placeholder text="Sponsors" />
+          <Sponsors />
+        </EventPage>
+      </Route>
+      <Route exact path="/events/:eventId/sponsors/:sponsorIndex">
+        <EventPage>
+          <Sponsor />
         </EventPage>
       </Route>
       <Route exact path="/events/:eventId/search">
@@ -129,7 +142,7 @@ const Events = () => {
           <Placeholder text="Drops" />
         </EventPage>
       </Route>
-      <Route exact path="/events/:eventId/tickets" cock={"balls"}>
+      <Route exact path="/events/:eventId/tickets">
         <EventPage>
           <Tickets />
         </EventPage>

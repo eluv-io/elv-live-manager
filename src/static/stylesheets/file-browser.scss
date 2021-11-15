@@ -30,9 +30,25 @@
     display: flex;
     margin: 20px 0;
 
+    &-content {
+      width: 100%;
+    }
+
     h1 {
       font-size: 24px;
+      font-weight: 300;
       width: 100%;
+    }
+
+    h2 {
+      color: $mediumestgray;
+      font-size: 14px;
+      font-weight: 300;
+      margin-top: 5px;
+    }
+
+    .bold {
+      font-weight: bold;
     }
 
     .actions-container {

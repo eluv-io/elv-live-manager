@@ -10,6 +10,8 @@ events:
     (if accessed from the featured sites on the main page) or
 
     https://live.eluv.io/<tenant-slug>/<event-slug>
+  sponsor_image: The sponsor logos may appear against both light and dark backgrounds in different parts of the site. Specify a logo image suitable for each background.
+  sponsor_tagline: In certain places, a tagline will appear before the sponsor list, for example "Sponsored by". You can customize or remove this tagline with this field.
   ticket_external_url: If this ticket is intended to be purchased on a different site, specify it here. This ticket SKU will not be purchasable on Eluvio LIVE.
   ticket_hidden: If selected, this ticket will not be shown and will not be purchasable. Tickets of this type may still be redeemed.
   ticket_requires_shipping: If specified, shipping information will be collected when this ticket type is purchased. Use this for cases like ticket + merchandise bundles.

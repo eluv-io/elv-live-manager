@@ -41,7 +41,7 @@ const MainPage = observer(() => {
       </div>
       <div className="form__section">
         <h2 className="form__section__header">
-          Headers
+          Header Text
         </h2>
         <Input label="Hide Header Text" objectId={objectId} path="info/event_info" name="hero_info" hint="events/hide_header_text" type="checkbox" />
         <MainPageText />

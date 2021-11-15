@@ -156,9 +156,17 @@ const FileBrowser = observer(({header="Select a File", objectId, extensions, Sel
       <div className="file-browser">
         { directoryModal }
         <div className="file-browser__header">
-          <h1 className="content-header">
-            { header }
-          </h1>
+          <div className="file-browser__header-content">
+            <h1>
+              { header }
+            </h1>
+            {
+              extensions ?
+                <h2>
+                  Allowed extensions: <span className="bold">{ extensions.join(", ") }</span>
+                </h2> : null
+            }
+          </div>
           {
             Close ?
               <div className="actions-container">

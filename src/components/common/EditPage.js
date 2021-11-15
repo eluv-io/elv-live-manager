@@ -19,7 +19,7 @@ const EditPage = observer(({objectId, header, children, className=""}) => {
   return (
     <ErrorBoundary key={`edit-page-${header}`}>
       <SetFramePath />
-      <div className={`page-content edit-page ${className}`}>
+      <main className={`page-content edit-page ${className}`}>
         <div className="edit-page__header">
           <h2 className="edit-page__header__text">{ header } {editStore.currentLocalization === "default" ? "" : ` - ${LanguageCodes[editStore.currentLocalization]} Localization`}</h2>
           {
@@ -40,7 +40,7 @@ const EditPage = observer(({objectId, header, children, className=""}) => {
         </div>
         <Breadcrumbs />
         { children }
-      </div>
+      </main>
     </ErrorBoundary>
   );
 });

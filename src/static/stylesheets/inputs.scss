@@ -208,6 +208,7 @@ textarea {
     width: 100%;
 
     &__symbol {
+      color: $mediumestgray;
       padding-right: 5px;
     }
 
@@ -326,6 +327,7 @@ textarea {
     border-radius: 3px;
     display: flex;
     height: 35px;
+    max-width: 400px;
     min-width: 400px;
     width: 100%;
   }
@@ -367,8 +369,20 @@ textarea {
     padding: 0;
 
     &-active {
-      * {
+      circle {
+        fill: $blue;
         stroke: $blue;
+      }
+
+      polygon {
+        fill: $white;
+        stroke: $white;
+      }
+
+      &:hover {
+        polygon {
+          stroke: $white;
+        }
       }
     }
   }

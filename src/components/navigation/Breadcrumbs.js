@@ -29,6 +29,15 @@ const TicketSKU = match => {
   return { label: ticketSku.label, link: UrlJoin("/events", match.params.eventId, "tickets", match.params.ticketClassId, match.params.ticketSKUId) };
 };
 
+const Sponsor = match => {
+  const sponsors = editStore.Value(match.params.eventId, UrlJoin("info", "sponsors")) || [];
+  const sponsor = sponsors[match.params.sponsorIndex];
+
+  if(!sponsor) { return null; }
+
+  return { label: sponsor.name, link: UrlJoin("/events", match.params.eventId, "sponsors", match.params.sponsorIndex) };
+};
+
 const EventBreadcrumbs = match => {
   const event = contentStore.Event(match.params.eventId);
 
@@ -59,6 +68,10 @@ const EventBreadcrumbs = match => {
   if(match.path.includes("/tickets")) {
     breadcrumbs.push(TicketClass(match));
     breadcrumbs.push(TicketSKU(match));
+  }
+
+  if(match.path.includes("/sponsors")) {
+    breadcrumbs.push(Sponsor(match));
   }
 
   return breadcrumbs;

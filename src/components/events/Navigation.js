@@ -14,7 +14,7 @@ const EventNavigation = observer(() => {
   const basePath = UrlJoin("/events", match.params.eventId);
 
   return (
-    <div className="navigation navigation-sub events__navigation">
+    <nav className="navigation navigation-sub events__navigation">
       <NavLink className="navigation__link navigation__link-back" exact to="/events">Back to Events</NavLink>
       <NavLink className="navigation__link" exact to={basePath}>Overview</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "basic")}>Basic Info</NavLink>
@@ -27,7 +27,7 @@ const EventNavigation = observer(() => {
       <NavLink className="navigation__link" to={UrlJoin(basePath, "tickets")}>Tickets</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "drops")}>Drops</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "search")}>Search and Analytics</NavLink>
-    </div>
+    </nav>
   );
 });
 
