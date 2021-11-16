@@ -14,6 +14,7 @@ import Utils from "@eluvio/elv-client-js/src/Utils";
 import EluvioPlayer, {EluvioPlayerParameters} from "@eluvio/elv-player-js";
 import Confirm from "Components/common/Confirm";
 import {DateTimePicker} from "@material-ui/pickers";
+import {Link, Redirect} from "react-router-dom";
 
 import Hints from "Assets/documentation/InputHints.yaml";
 
@@ -23,6 +24,8 @@ import PictureIcon from "Assets/icons/image.svg";
 import AddIcon from "Assets/icons/plus.svg";
 import RemoveIcon from "Assets/icons/x.svg";
 import PlayIcon from "Assets/icons/play-circle.svg";
+import DownCaret from "Assets/icons/down-caret.svg";
+import UpCaret from "Assets/icons/up-caret.svg";
 
 const Validations = {
   NAN: (value) => isNaN(value) ? 0 : value,
@@ -126,6 +129,10 @@ const FormatProps = props => {
 };
 
 const FieldHidden = props => {
+  if(editStore.currentLocalization !== "default" && !props.localize) {
+    return true;
+  }
+
   if(props.dependsOn) {
     const dependantValue = editStore.Value(props.objectId, props.dependsOn, "", {localize: props.localize});
 
@@ -151,15 +158,15 @@ export const EditField = observer((props) => {
   const path = typeof props.path === "undefined" ? "info" : props.path;
   let value = editStore.Value(props.objectId, path, props.name, {localize: props.localize});
 
-  value = props.datetime ? value || null : value;
+  value = props.datetime ? value || null : value || "";
 
   useEffect(() => {
     if(props.uuid && !value) {
       UpdateValue(props, GenerateUUID());
     }
 
-    if(props.default_value && typeof value === "undefined") {
-      UpdateValue(props, props.default_value);
+    if(props.defaultValue && typeof value === "undefined") {
+      UpdateValue(props, props.defaultValue);
     }
   }, []);
 
@@ -322,6 +329,155 @@ export const Form = (props) => {
   );
 };
 
+export const FormActions = ({backLink, Remove, removeText="Remove", removeConfirmationText="Are you sure you want to remove this item?"}) => {
+  const [deleted, setDeleted] = useState(false);
+
+  if(deleted) {
+    return <Redirect to={backLink} />;
+  }
+
+  return (
+    <div className="actions-container form-actions">
+      <Link to={backLink} className="action action-primary">
+        Done
+      </Link>
+      {
+        Remove ?
+          <button
+            className="action action-danger"
+            onClick={async event => {
+              event.stopPropagation();
+              event.preventDefault();
+
+              await Confirm({
+                message: removeConfirmationText,
+                Confirm: async () => {
+                  await Remove();
+                  setDeleted(true);
+                }
+              });
+            }}
+          >
+            { removeText }
+          </button> : null
+      }
+    </div>
+  );
+};
+
+const SwapButtons = props => {
+  const list = editStore.Value(props.objectId, props.path, "", { localize: props.localize }) || [];
+
+  let swapUpButton, swapDownButton;
+  if(props.index > 0) {
+    swapUpButton = (
+      <IconButton
+        icon={UpCaret}
+        title="Move Item Up"
+        className="action-icon swap-button swap-button-up"
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          editStore.SwapListValue(props.objectId, props.path, props.index, props.index - 1, { localize: props.localize });
+        }}
+      />
+    );
+  }
+
+  if(props.index < list.length - 1) {
+    swapDownButton = (
+      <IconButton
+        icon={DownCaret}
+        title="Move Item Down"
+        className="action-icon swap-button swap-button-down"
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          editStore.SwapListValue(props.objectId, props.path, props.index, props.index + 1, { localize: props.localize });
+        }}
+      />
+    );
+  }
+
+  return  (
+    <>
+      { swapUpButton }
+      { swapDownButton }
+    </>
+  );
+};
+
+export const InputList = observer(props => {
+  const [hidden, setHidden] = useState(false);
+  let list = editStore.Value(props.objectId, props.path, "", { localize: props.localize }) || [];
+
+  if(typeof list === "object" && !Array.isArray(list)) {
+    list = Object.values(list);
+  }
+
+  if(FieldHidden(props)) {
+    return null;
+  }
+
+  return (
+    <LabelledField
+      label={
+        <div className="input-list__label">
+          { props.label }
+          <IconButton
+            icon={hidden ? DownCaret : UpCaret}
+            title={hidden ? "Show Section" : "Hide Section"}
+            className="input-list__show-hide-button"
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              setHidden(!hidden);
+            }}
+          />
+        </div>
+      }
+    >
+      <div className="input-list" style={hidden ? {display: "none"} : {}}>
+        { list.map((item, index) =>
+          <div className="input-list__item">
+            <div className="input-list__item-content">
+              { props.Render(item, index) }
+            </div>
+            <div className="actions-container input-list__item__actions-container">
+              <SwapButtons {...props} index={index} />
+              <IconButton
+                icon={RemoveIcon}
+                title="Remove Item"
+                className="action-icon"
+                onClick={async event => {
+                  event.stopPropagation();
+                  event.preventDefault();
+
+                  await Confirm({
+                    message: "Are you sure you want to remove this item?",
+                    Confirm: async () => editStore.RemoveValue(props.objectId, props.path, index.toString(), { localize: props.localize })
+                  });
+                }}
+              />
+            </div>
+          </div>
+        )}
+        <div className="actions-container input-list__add-actions-container">
+          <IconButton
+            icon={AddIcon}
+            title="Add Item"
+            className="action-icon"
+            onClick={() => editStore.AppendListValue(props.objectId, props.path, props.itemSpec, { localize: props.localize })}
+          />
+        </div>
+      </div>
+    </LabelledField>
+  );
+});
+
 const MultiSelectComponent = ({name, values, buttonLabel, onChange, options, className=""}) => {
   values = values || [];
 
@@ -377,7 +533,7 @@ const MultiSelectComponent = ({name, values, buttonLabel, onChange, options, cla
               icon={RemoveIcon}
               label={`Remove ${buttonLabel || name}`}
               onClick={() => Remove(index)}
-              className="multiselect__button multiselect__button-remove"
+              className="action-icon multiselect__button multiselect__button-remove"
             />
           </div>
         </div>
@@ -387,7 +543,7 @@ const MultiSelectComponent = ({name, values, buttonLabel, onChange, options, cla
           icon={AddIcon}
           label={`Add ${buttonLabel || name}`}
           onClick={() => Add()}
-          className="multiselect__button multiselect__button-add"
+          className="action-icon multiselect__button multiselect__button-add"
         />
       </div>
     </div>

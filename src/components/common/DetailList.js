@@ -4,10 +4,15 @@ import Confirm from "Components/common/Confirm";
 import ImageIcon from "Components/common/ImageIcon";
 import DeleteIcon from "Assets/icons/x-square";
 import React, {useState} from "react";
+import {SafeTraverse} from "Utils/Misc";
+import Hints from "Assets/documentation/InputHints.yaml";
+import ToolTip from "Components/common/ToolTip";
+import HintIcon from "Assets/icons/help-square";
 
 const DetailList = observer(
   ({
     header,
+    hint,
     columnNames,
     columnClasses=[],
     columnSizes="1fr",
@@ -24,6 +29,10 @@ const DetailList = observer(
       return <Redirect to={redirect} />;
     }
 
+    if(hint) {
+      hint = SafeTraverse(Hints, hint);
+    }
+
     const rowStyle = { gridTemplateColumns: columnSizes + " 50px" };
     return (
       <>
@@ -32,6 +41,16 @@ const DetailList = observer(
         </h2>
         <div className="actions-container">
           <button className="action action-primary" onClick={() => setRedirect(Create)}>{ createText }</button>
+          {
+            hint ?
+              <ToolTip className="hint" content={<pre className="labelled-field__hint-content">{ hint }</pre>}>
+                <ImageIcon
+                  alt={hint}
+                  icon={HintIcon}
+                  className="labelled-field__hint"
+                />
+              </ToolTip> : null
+          }
         </div>
         {
           items.length === 0 ?
@@ -62,7 +81,6 @@ const DetailList = observer(
                           event.preventDefault();
                           event.stopPropagation();
 
-                          console.log(itemIndex);
                           await Confirm({
                             message: typeof removeText === "function" ? removeText(item) : removeText,
                             Confirm: async () => await Remove(itemIndex)

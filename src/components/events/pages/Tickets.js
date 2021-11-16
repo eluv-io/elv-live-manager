@@ -4,7 +4,7 @@ import {editStore} from "Stores";
 import {Redirect, useRouteMatch} from "react-router-dom";
 import UrlJoin from "url-join";
 import DetailList from "Components/common/DetailList";
-import {DateTime, FileInput, Form, Input, Price, TextArea} from "Components/common/Inputs";
+import {DateTime, FileInput, Form, FormActions, Input, Price, TextArea} from "Components/common/Inputs";
 import {FormatPriceString} from "Utils/Misc";
 import TicketClassSpec from "Specs/TicketClass";
 import * as luxon from "luxon";
@@ -45,6 +45,12 @@ export const TicketSku = observer(() => {
         <DateTime label="End Time" objectId={objectId} path={basePath} name="end_time" />
         <Input label="External URL" objectId={objectId} path={basePath} name="external_url" hint="events/ticket_external_url" />
         <Input type="checkbox" label="Hidden" objectId={objectId} path={basePath} name="hidden" hint="events/ticket_hidden" />
+        <FormActions
+          backLink={UrlJoin("/events", objectId, "tickets", ticketClass.uuid)}
+          removeText="Remove Ticket SKU"
+          removeConfirmationText="Are you sure you want to remove this ticket sKU?"
+          Remove={async () => editStore.RemoveValue(objectId, UrlJoin("info", "tickets", ticketClassIndex.toString(), "skus"), ticketSkuIndex)}
+        />
       </div>
     </Form>
   );
@@ -104,6 +110,12 @@ export const TicketClass = observer(() => {
         <FileInput label="Image" objectId={objectId} path={basePath} name="image"  image localize />
         <Input type="checkbox" label="Hidden" objectId={objectId} path={basePath} name="hidden" hint="events/ticket_hidden" />
         <Input type="checkbox" label="Requires Shipping" objectId={objectId} path={basePath} name="requires_shipping" hint="events/ticket_requires_shipping" />
+        <FormActions
+          backLink={UrlJoin("/events", objectId, "tickets")}
+          removeText="Remove Ticket Class"
+          removeConfirmationText="Are you sure you want to remove this ticket class?"
+          Remove={async () => editStore.RemoveValue(objectId, UrlJoin("info", "tickets"), ticketClassIndex)}
+        />
       </div>
     </Form>
   );

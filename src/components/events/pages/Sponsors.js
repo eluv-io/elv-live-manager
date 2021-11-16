@@ -5,7 +5,7 @@ import DetailList from "Components/common/DetailList";
 import UrlJoin from "url-join";
 import React from "react";
 import SponsorSpec from "Specs/Sponsor";
-import {FileInput, Form, Input} from "Components/common/Inputs";
+import {FileInput, Form, FormActions, Input} from "Components/common/Inputs";
 
 export const Sponsor = observer(() => {
   const match = useRouteMatch();
@@ -28,6 +28,12 @@ export const Sponsor = observer(() => {
         <Input label="Link" objectId={objectId} path={basePath} name="link" url localize />
         <FileInput label="Logo (For Light Background)" objectId={objectId} path={basePath} name="image" hint="events/sponsor_image" image localize />
         <FileInput label="Logo (For Dark Background)" objectId={objectId} path={basePath} name="image_light" hint="events/sponsor_image" image localize />
+        <FormActions
+          backLink={UrlJoin("/events", objectId, "sponsors")}
+          removeText="Remove Sponsor"
+          removeConfirmationText="Are you sure you want to remove this sponsor?"
+          Remove={async () => editStore.RemoveValue(objectId, UrlJoin("info", "sponsors"), match.params.sponsorIndex)}
+        />
       </div>
     </Form>
   );

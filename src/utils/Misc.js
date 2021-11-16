@@ -86,7 +86,23 @@ export const SafeSet = (object, value, ...keys) => {
     if(index === keys.length - 1) {
       pointer[key] = value;
     } else {
-      if(!pointer[key]) { pointer[key] = {}; }
+      if(
+        (
+          // Next key looks like an array index
+          keys[index + 1] &&
+          parseInt(keys[index + 1]).toString() === keys[index + 1]
+        ) &&
+        (
+          // Value is not initialized or it is initialized as empty object
+          !pointer[key] ||
+          (typeof pointer[key] === "object" && Object.keys(pointer[key]).length === 0)
+        )
+      ) {
+        // Initialize value as an array
+        pointer[key] = [];
+      } else if(!pointer[key]) {
+        pointer[key] = {};
+      }
 
       pointer = pointer[key];
     }

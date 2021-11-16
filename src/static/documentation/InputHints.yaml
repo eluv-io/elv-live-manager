@@ -1,4 +1,5 @@
 events:
+  footer_links: Here you can specify additional links to include in the footer. These links can either be normal links to other websites, or links which when pressed, open a modal containing custom HTML or rich text content.
   hero_image: This is the hero image that will be displayed on wide screens, such as desktops, laptops and tablets.
   hero_image_mobile: This is the hero image that will be displayed on narrow screens, such as phones. It is highly recommended that you have a mobile-optimized hero image.
   logo_link: If a custom logo is set, you can specify a custom URL for the logo image to link to instead of live.eluv.io.

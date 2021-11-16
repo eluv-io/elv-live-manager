@@ -17,7 +17,7 @@ const MainPageText = observer(() => {
       <Input label="Header" objectId={objectId} path="info/event_info" name="event_header" localize />
       <Input label="Subheader" objectId={objectId} path="info/event_info" name="event_subheader" localize />
       <Input label="Date Header" objectId={objectId} path="info/event_info" name="date_subheader" localize />
-      <Input label="Show Countdown" objectId={objectId} path="info/event_info" name="show_countdown" type="checkbox" />
+      <Input label="Show Countdown" objectId={objectId} path="info/event_info" name="show_countdown" type="checkbox" localize />
     </>
   );
 });
@@ -43,7 +43,7 @@ const MainPage = observer(() => {
         <h2 className="form__section__header">
           Header Text
         </h2>
-        <Input label="Hide Header Text" objectId={objectId} path="info/event_info" name="hero_info" hint="events/hide_header_text" type="checkbox" />
+        <Input label="Hide Header Text" objectId={objectId} path="info/event_info" name="hero_info" hint="events/hide_header_text" type="checkbox" localize />
         <MainPageText />
       </div>
     </Form>
