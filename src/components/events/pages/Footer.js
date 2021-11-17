@@ -6,6 +6,7 @@ import DetailList from "Components/common/DetailList";
 import UrlJoin from "url-join";
 import {FileInput, Form, FormActions, Input, InputList, Select, TextArea} from "Components/common/Inputs";
 import FooterLinkSpec from "Specs/FooterLink";
+import RichText from "Components/common/RichText";
 
 export const FooterLink = observer(() => {
   const match = useRouteMatch();
@@ -31,7 +32,7 @@ export const FooterLink = observer(() => {
           <option value="HTML">HTML</option>
         </Select>
         <Input label="URL" objectId={objectId} path={basePath} name="url" localize only={() => footerLink.type === "URL"} />
-        <TextArea label="Content (Rich Text)" objectId={objectId} path={basePath} name="content_rich_text" url localize only={() => footerLink.type === "Rich Text"} />
+        <RichText label="Content (Rich Text)" objectId={objectId} path={basePath} name="content_rich_text" url localize only={() => footerLink.type === "Rich Text"} />
         <FileInput label="Content (HTML)" objectId={objectId} path={basePath} name="content_html" localize only={() => footerLink.type === "HTML"} extensions={["html"]}/>
         <FormActions
           backLink={UrlJoin("/events", objectId, "footer")}

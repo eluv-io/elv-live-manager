@@ -342,6 +342,16 @@ textarea {
   }
 }
 
+.rich-text {
+  margin-bottom: 10px;
+
+  &__editor {
+    margin-bottom: 20px;
+    min-height: 200px;
+    min-width: 710px;
+  }
+}
+
 .multiselect {
   margin-bottom: 10px;
 

@@ -1,6 +1,7 @@
 files:
   include: "src/static/stylesheets/*.scss"
   ignore:
+    - "src/static/stylesheets/ReactDraft.scss"
     - "src/static/stylesheets/loaders.scss"
     - "src/static/stylesheets/reset.scss"
 rules:

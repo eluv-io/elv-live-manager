@@ -82,6 +82,7 @@ class EditStore {
   }
 
   SetValue(objectId, path, name, value, options={}) {
+    console.log("SET VALUE", name);
     path = (typeof path === "undefined" ? "" : path).toString();
     name = (typeof name === "undefined" ? "" : name).toString();
 

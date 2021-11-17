@@ -27,6 +27,7 @@ import PlayIcon from "Assets/icons/play-circle.svg";
 import DownCaret from "Assets/icons/down-caret.svg";
 import UpCaret from "Assets/icons/up-caret.svg";
 
+
 const Validations = {
   NAN: (value) => isNaN(value) ? 0 : value,
   Numeric: (value) => (value || "").toString().replace(/[^0-9\.]+/g, ""),

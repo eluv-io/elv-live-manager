@@ -36,8 +36,8 @@ const MainPage = observer(() => {
         <Input dependsOn="/info/event_images/logo" label="Logo Link" objectId={objectId} path="info/event_images" name="logo_link" hint="events/logo_link" localize/>
         <FileInput label="Hero Image (Desktop)" objectId={objectId} path="info/event_images" name="hero_background" hint="events/hero_image" image localize />
         <FileInput label="Hero Image (Mobile)" objectId={objectId} path="info/event_images" name="hero_background_mobile" hint="events/hero_image_mobile" image localize />
-        <ContentInput label="Hero Video" objectId={objectId} path="info/event_images" name="hero_video" hint="events/hero_video" localize />
-
+        <ContentInput label="Hero Video (Desktop)" objectId={objectId} path="info/event_images" name="hero_video" hint="events/hero_video" localize />
+        <ContentInput label="Hero Video (Mobile)" objectId={objectId} path="info/event_images" name="hero_video_mobile" hint="events/hero_video" localize />
       </div>
       <div className="form__section">
         <h2 className="form__section__header">
