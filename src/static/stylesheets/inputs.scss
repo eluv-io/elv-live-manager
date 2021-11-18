@@ -139,6 +139,16 @@ input {
     width: 20px;
   }
 
+  &[type="color"] {
+    border-radius: 10px;
+    cursor: pointer;
+    height: 35px;
+    max-width: 35px;
+    min-width: 0;
+    padding: 0;
+    width: 35px;
+  }
+
   &:read-only {
     border: 0;
     opacity: 0.75;
@@ -265,11 +275,19 @@ textarea {
     padding: 15px 20px;
   }
 
-  input {
-    &:not([type="checkbox"]) {
-      min-width: 400px;
-    }
+  .input-text {
+    min-width: 400px;
+  }
 
+  .input-color {
+    &__text {
+      margin-left: 10px;
+      max-width: 100px;
+      min-width: 100px;
+    }
+  }
+
+  input {
     &[type="checkbox"] {
       height: 35px;
       width: 20px;
@@ -305,6 +323,10 @@ textarea {
 
   // sass-lint:disable class-name-format
   // Material UI changes
+  .datetime-clear {
+    margin-left: 10px;
+  }
+
   .MuiFormControl-root {
     * {
       box-sizing: border-box;
@@ -334,9 +356,11 @@ textarea {
   }
 
   .MuiInputBase-input {
+    border: 1px solid $mediumgray;
     cursor: pointer;
     max-height: 35px;
     min-height: 35px;
+    min-width: 400px;
     opacity: 1;
     padding: 5px 10px;
   }

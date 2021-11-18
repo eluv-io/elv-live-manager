@@ -1,5 +1,6 @@
 events:
-  footer_links: Here you can specify additional links to include in the footer. These links can either be normal links to other websites, or links which when pressed, open a modal containing custom HTML or rich text content.
+  footer_links: Here you can specify additional links to include in the footer. These links can either be normal links to other websites, or links which, when clicked, open a modal containing custom HTML or rich text content.
+  info_card_page_hint: This text will be displayed next to the 'Next Page' button on the previous page.
   hero_image: This is the hero image that will be displayed on wide screens, such as desktops, laptops and tablets.
   hero_image_mobile: This is the hero image that will be displayed on narrow screens, such as phones. It is highly recommended that you have a mobile-optimized hero image.
   hero_video: You can specify a video that will play in place of the hero image. The video will be autoplayed, and will be muted. For desktop and mobile versions, the same aspect ratio suggestions apply.

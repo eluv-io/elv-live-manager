@@ -88,7 +88,7 @@ export const Footer = observer(() => {
           path="info/faq"
           itemSpec={{question: "", answer: ""}}
           localize
-          dependsOn={"info/show_custom_faq"}
+          dependsOn={["info/show_faq", "info/show_custom_faq"]}
           Render={(item, index) =>
             <>
               <TextArea label="Question" objectId={objectId} path={UrlJoin("info", "faq", index.toString())} name="question" localize />

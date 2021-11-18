@@ -18,7 +18,7 @@ import PictureIcon from "Assets/icons/image.svg";
 import UploadIcon from "Assets/icons/upload.svg";
 import UploadDirectoryIcon from "Assets/icons/upload-directory.svg";
 import DirectoryAddIcon from "Assets/icons/folder-plus.svg";
-import DeleteIcon from "Assets/icons/x-square.svg";
+import DeleteIcon from "Assets/icons/x.svg";
 
 const DirectoryModal = observer(({Create, Close}) => {
   const [name, setName] = useState("");

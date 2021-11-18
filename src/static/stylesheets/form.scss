@@ -1,7 +1,7 @@
 .form {
   &__section {
     margin-bottom: 20px;
-    padding: 0 0 40px;
+    padding: 0 0 20px;
 
     &:not(:last-child) {
       border-bottom: 1px solid $lightgray;
@@ -16,5 +16,5 @@
 }
 
 .form-actions {
-  margin-top: 20px;
+  margin-top: 40px;
 }

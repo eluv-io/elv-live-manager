@@ -2,7 +2,7 @@ import {observer} from "mobx-react";
 import {Link, Redirect} from "react-router-dom";
 import Confirm from "Components/common/Confirm";
 import ImageIcon from "Components/common/ImageIcon";
-import DeleteIcon from "Assets/icons/x-square";
+import DeleteIcon from "Assets/icons/x";
 import React, {useState} from "react";
 import {SafeTraverse} from "Utils/Misc";
 import Hints from "Assets/documentation/InputHints.yaml";

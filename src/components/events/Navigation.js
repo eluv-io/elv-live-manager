@@ -2,7 +2,6 @@ import React from "react";
 import UrlJoin from "url-join";
 import {NavLink, useRouteMatch} from "react-router-dom";
 import {observer} from "mobx-react";
-import {editStore} from "Stores";
 
 const EventNavigation = observer(() => {
   const match = useRouteMatch();
@@ -20,7 +19,7 @@ const EventNavigation = observer(() => {
       <NavLink className="navigation__link" to={UrlJoin(basePath, "basic")}>Basic Info</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "main")}>Main Page</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "landing")}>Landing Page</NavLink>
-      <NavLink className="navigation__link" to={UrlJoin(basePath, "info")}>Info Cards</NavLink>
+      <NavLink className="navigation__link" to={UrlJoin(basePath, "info_cards")}>Info Cards</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "footer")}>Footer</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "sponsors")}>Sponsors</NavLink>
       <NavLink className="navigation__link" to={UrlJoin(basePath, "social")}>Social Media</NavLink>

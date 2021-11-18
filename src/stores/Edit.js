@@ -9,6 +9,7 @@ class EditStore {
   versionHashes = {};
 
   edits = {}
+  publicMetadata = {};
   originalMetadata = {};
   updatedMetadata = {};
 
@@ -33,7 +34,26 @@ class EditStore {
     this.rootStore = rootStore;
   }
 
-  LoadMetadata = flow(function * ({objectId, versionHash, path}) {
+  LoadPublicMetadata = flow(function * ({objectId, versionHash}) {
+    if(!objectId) {
+      objectId = Utils.DecodeVersionHash(versionHash).objectId;
+    } else if(!versionHash) {
+      versionHash = yield this.client.LatestVersionHash({objectId});
+    }
+
+    this.versionHashes[objectId] = versionHash;
+
+    if(!this.publicMetadata[objectId]) {
+      this.publicMetadata[objectId] = yield this.client.ContentObjectMetadata({
+        versionHash,
+        metadataSubtree: "/public"
+      });
+    }
+
+    return this.publicMetadata[objectId];
+  });
+
+  LoadAssetMetadata = flow(function * ({objectId, versionHash}) {
     if(this.originalMetadata[objectId]) { return; }
 
     if(!objectId) {
@@ -45,7 +65,7 @@ class EditStore {
     this.versionHashes[objectId] = versionHash;
     this.originalMetadata[objectId] = yield this.client.ContentObjectMetadata({
       versionHash,
-      metadataSubtree: path || "/public/asset_metadata"
+      metadataSubtree: "/public/asset_metadata"
     });
     this.updatedMetadata[objectId] = {
       default: this.originalMetadata[objectId]
@@ -82,7 +102,6 @@ class EditStore {
   }
 
   SetValue(objectId, path, name, value, options={}) {
-    console.log("SET VALUE", name);
     path = (typeof path === "undefined" ? "" : path).toString();
     name = (typeof name === "undefined" ? "" : name).toString();
 

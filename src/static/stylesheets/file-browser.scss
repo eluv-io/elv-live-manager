@@ -61,6 +61,23 @@
     padding: 10px 0;
   }
 
+  &__buttons {
+    align-items: center;
+    display: flex;
+
+    .action-icon {
+      border: 0;
+
+      &:not(:last-child) {
+        margin-right: 5px;
+      }
+
+      * {
+        stroke-width: 1px;
+      }
+    }
+  }
+
   &__path-container {
     align-items: center;
     border-top: 2px solid $lightgray;
@@ -208,6 +225,12 @@
 
       width: 20px;
     }
+  }
+}
+
+.directory-modal-container {
+  .modal__content {
+    max-width: 500px;
   }
 }
 

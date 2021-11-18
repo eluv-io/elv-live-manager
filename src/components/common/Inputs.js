@@ -37,7 +37,12 @@ const Validations = {
 
 export const LabelledField = observer(({name, label, hint, children, className=""}) => {
   if(hint) {
-    hint = SafeTraverse(Hints, hint);
+    let hintPath = hint;
+    hint = SafeTraverse(Hints, hintPath);
+
+    if(!hint) {
+      console.warn("Missing hint:", hintPath);
+    }
   }
 
   return (
@@ -135,17 +140,17 @@ const FieldHidden = props => {
   }
 
   if(props.dependsOn) {
-    const dependantValue = editStore.Value(props.objectId, props.dependsOn, "", {localize: props.localize});
+    let dependsOn = Array.isArray(props.dependsOn) ? props.dependsOn : [props.dependsOn];
 
-    if(!dependantValue) {
+    if(dependsOn.find(path => !editStore.Value(props.objectId, path, "", {localize: props.localize}))) {
       return true;
     }
   }
 
   if(props.hideIf) {
-    const dependantValue = editStore.Value(props.objectId, props.hideIf, "", {localize: props.localize});
+    let hideIf = Array.isArray(props.hideIf) ? props.hideIf : [props.hideIf];
 
-    if(dependantValue) {
+    if(hideIf.find(path => !editStore.Value(props.objectId, path, "", {localize: props.localize}))) {
       return true;
     }
   }
@@ -232,7 +237,7 @@ export const EditField = observer((props) => {
 
 export const Input = (props) => {
   return (
-    <EditField {...props}>
+    <EditField {...props} className={`input input-${props.type || "text"} ${props.className || ""}`}>
       <input />
     </EditField>
   );
@@ -259,25 +264,51 @@ export const Select = (props) => {
   );
 };
 
+export const Color = (props) => {
+  return (
+    <LabelledField label={props.label} className="input-color">
+      <Input {...props} className="input-color__color" label={undefined} path={UrlJoin(props.path || "", props.name)} name="color" type="color" />
+      <Input {...props} className="input-color__text" label={undefined} path={UrlJoin(props.path || "", props.name)} name="color" type="text" />
+    </LabelledField>
+  );
+};
+
+export const ButtonCustomization = (props) => {
+  return (
+    <>
+      <Input {...props} label="Button Text" name="text" />
+      <Input {...props} path={UrlJoin(props.path || "", "text_color")} label="Text Color" name="color" type="color" />
+      <Input {...props}  path={UrlJoin(props.path || "", "background_color")} label="Background Color" name="color" type="color" />
+    </>
+  );
+};
+
 export const DateTime = (props) => {
   return (
-    <EditField {...props} datetime>
-      <DateTimePicker
-        format="DDDD        H:mm ZZZZ"
-        placeholder="No Date Selected"
-        InputProps={{
-          endAdornment: (
-            <IconButton
-              icon={RemoveIcon}
-              onClick={event => {
-                event.stopPropagation();
-                UpdateValue(props, null);
-              }}
-            />
-          )
-        }}
-      />
-    </EditField>
+    <EditField
+      {...props}
+      datetime
+      Render={filteredProps =>
+        <DateTimePicker
+          {...filteredProps}
+          format="DDDD  -  H:mm ZZZZ"
+          placeholder="No Date Selected"
+          InputProps={{
+            endAdornment: (
+              filteredProps.value ?
+                <IconButton
+                  className="datetime-clear"
+                  icon={RemoveIcon}
+                  onClick={event => {
+                    event.stopPropagation();
+                    UpdateValue(props, null);
+                  }}
+                /> : null
+            )
+          }}
+        />
+      }
+    />
   );
 };
 
@@ -353,8 +384,14 @@ export const FormActions = ({backLink, Remove, removeText="Remove", removeConfir
               await Confirm({
                 message: removeConfirmationText,
                 Confirm: async () => {
-                  await Remove();
+                  // Set deleted first so the page redirects before it does any destructive actions
                   setDeleted(true);
+                  await new Promise(resolve =>
+                    setTimeout(async () => {
+                      await Remove();
+                      resolve();
+                    }, 10)
+                  );
                 }
               });
             }}
@@ -688,10 +725,7 @@ export const ContentInput = observer((props) => {
       setSelectionName(value.name);
       setSelectionPlayable(value.playable);
     } else {
-      editStore.LoadMetadata({
-        versionHash: selectedHash,
-        path: "/public"
-      })
+      editStore.LoadPublicMetadata({versionHash: selectedHash})
         .then(() => {
           setSelectionName(
             editStore.Value(
@@ -725,6 +759,7 @@ export const ContentInput = observer((props) => {
               header={`Select content for '${props.label || props.name}'`}
               requireVersion={props.requireVersion}
               Select={selection => {
+                console.log("SELECT");
                 if(player) { player.Destroy(); }
 
                 setPlayer(undefined);

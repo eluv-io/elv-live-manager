@@ -20,6 +20,7 @@ import Breadcrumbs from "Components/navigation/Breadcrumbs";
 import SocialMedia from "Components/events/pages/SocialMedia";
 import {Sponsor, Sponsors} from "Components/events/pages/Sponsors";
 import {Footer, FooterLink} from "Components/events/pages/Footer";
+import {InfoCard, InfoCardPage, InfoCards} from "Components/events/pages/InfoCards";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -62,7 +63,7 @@ const EventPage = observer(({children, Render}) => {
           Load={async () => {
             if(!match.params.eventId) { return ; }
 
-            await editStore.LoadMetadata({objectId: match.params.eventId});
+            await editStore.LoadAssetMetadata({objectId: match.params.eventId});
           }}
         >
           <EditPage objectId={match.params.eventId} header={event ? editStore.Value(match.params.eventId, "", "display_title") || event.name : "Events"}>
@@ -102,9 +103,19 @@ const Events = () => {
           <Placeholder text="Landing Page" />
         </EventPage>
       </Route>
-      <Route exact path="/events/:eventId/info">
+      <Route exact path="/events/:eventId/info_cards">
         <EventPage>
-          <Placeholder text="Info Cards" />
+          <InfoCards />
+        </EventPage>
+      </Route>
+      <Route exact path="/events/:eventId/info_cards/:infoCardIndex">
+        <EventPage>
+          <InfoCard />
+        </EventPage>
+      </Route>
+      <Route exact path="/events/:eventId/info_cards/:infoCardIndex/:infoCardPageIndex">
+        <EventPage>
+          <InfoCardPage />
         </EventPage>
       </Route>
       <Route exact path="/events/:eventId/footer">

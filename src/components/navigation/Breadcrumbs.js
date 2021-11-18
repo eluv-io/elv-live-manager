@@ -38,6 +38,30 @@ const Sponsor = match => {
   return { label: sponsor.name, link: UrlJoin("/events", match.params.eventId, "sponsors", match.params.sponsorIndex) };
 };
 
+const InfoCard = match => {
+  const infoCards = editStore.Value(match.params.eventId, UrlJoin("info", "event_descriptions")) || [];
+  const infoCard = infoCards[match.params.infoCardIndex];
+
+  if(!infoCard) { return null; }
+
+  return { label: infoCard.name, link: UrlJoin("/events", match.params.eventId, "info_cards", match.params.infoCardIndex) };
+};
+
+
+const InfoCardPage = match => {
+  const infoCards = editStore.Value(match.params.eventId, UrlJoin("info", "event_descriptions")) || [];
+  const infoCard = infoCards[match.params.infoCardIndex];
+
+  if(!infoCard) { return null; }
+
+  const page = parseInt(match.params.infoCardPageIndex);
+  const infoCardPage = (infoCard.pages || [])[page];
+
+  if(!infoCardPage) { return null; }
+
+  return { label: `Page ${page + 1}`, link: UrlJoin("/events", match.params.eventId, "info_cards", match.params.infoCardIndex, page.toString()) };
+};
+
 const EventBreadcrumbs = match => {
   const event = contentStore.Event(match.params.eventId);
 
@@ -52,7 +76,7 @@ const EventBreadcrumbs = match => {
     "basic": "Basic Info",
     "drops": "Drops",
     "footer": "Footer",
-    "info": "Info Cards",
+    "info_cards": "Info Cards",
     "landing": "Landing Page",
     "main": "Main Page",
     "search": "Search and Analytics",
@@ -72,6 +96,11 @@ const EventBreadcrumbs = match => {
 
   if(match.path.includes("/sponsors")) {
     breadcrumbs.push(Sponsor(match));
+  }
+
+  if(match.path.includes("/info_cards")) {
+    breadcrumbs.push(InfoCard(match));
+    breadcrumbs.push(InfoCardPage(match));
   }
 
   return breadcrumbs;

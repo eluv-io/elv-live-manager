@@ -1,7 +1,7 @@
 import React from "react";
 import {observer} from "mobx-react";
 import {editStore} from "Stores";
-import {ContentInput, FileInput, Form, Input, LabelledField, MultiSelect, Select} from "Components/common/Inputs";
+import {ContentInput, FileInput, Form, Input} from "Components/common/Inputs";
 import {useRouteMatch} from "react-router-dom";
 
 const MainPageText = observer(() => {
