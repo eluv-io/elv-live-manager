@@ -21,6 +21,8 @@ import SocialMedia from "Components/events/pages/SocialMedia";
 import {Sponsor, Sponsors} from "Components/events/pages/Sponsors";
 import {Footer, FooterLink} from "Components/events/pages/Footer";
 import {InfoCard, InfoCardPage, InfoCards} from "Components/events/pages/InfoCards";
+import LandingPage from "Components/events/pages/LandingPage";
+import Analytics from "Components/events/pages/Analytics";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -100,7 +102,7 @@ const Events = () => {
       </Route>
       <Route exact path="/events/:eventId/landing">
         <EventPage>
-          <Placeholder text="Landing Page" />
+          <LandingPage />
         </EventPage>
       </Route>
       <Route exact path="/events/:eventId/info_cards">
@@ -146,6 +148,11 @@ const Events = () => {
       <Route exact path="/events/:eventId/search">
         <EventPage>
           <Placeholder text="Search" />
+        </EventPage>
+      </Route>
+      <Route exact path="/events/:eventId/analytics">
+        <EventPage>
+          <Analytics />
         </EventPage>
       </Route>
       <Route exact path="/events/:eventId/drops">
