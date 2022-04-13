@@ -11,24 +11,22 @@ import EllipsisIcon from "../../static/icons/ellipsis.svg";
 
 import {rootStore} from "../../stores/index";
 import {toJS} from "mobx";
+import Preview from "./Preview";
 
 const ContentCreation = observer(() => {
   const [files, setFiles] = useState([]);
-  const [ingestingStep, setIngestingStep] = useState(undefined);
-  const [ingestingProgress, setIngestingProgress] = useState(0);
-  const [ingestingError, setIngestingError] = useState("");
-  const [objectId, setObjectId] = useState("");
-  let currentIngestObject = {};
 
   useEffect(() => {
     if(!rootStore.ingestStore.libraryId) throw Error("Unable to find library ID");
-
-    currentIngestObject = toJS(rootStore.ingestStore.ingestObject) || {};
   }, []);
 
   const HandleFiles = (files) => {
     if(!files.length) return;
+    files = files.map(file => {
+      const preview = file.type.startsWith("image") ? URL.createObjectURL(file) : undefined;
 
+      return Object.assign(file, {preview});
+    });
     setFiles(files);
   };
 
@@ -37,50 +35,19 @@ const ContentCreation = observer(() => {
     getInputProps,
     isDragActive
   } = useDropzone({
-    accept: "audio/*, video/*",
+    // accept: "audio/*, video/*, image/*",
     multiple: false,
     onDrop: HandleFiles
   });
 
   const HandleUpload = async () => {
     const libraryId = rootStore.ingestStore.libraryId;
-    setIngestingStep(1);
-    const {streamWarnings, errors, id, type, hash} = await rootStore.ingestStore.CreateProductionMaster({
+    await rootStore.ingestStore.CreateProductionMaster({
       libraryId,
       type: "hq__KkgmjowhPqV6a4tSdNDfCccFA23RSSiSBggszF4p5s3u4evvZniFkn6fWtZ3AzfkFxxFmSoR2G",
       files,
       title: rootStore.editStore.Value(libraryId, "", "title") || file.name,
-      encrypt: rootStore.editStore.Value(libraryId, "", "enable_drm") || false,
-      // callback: progress => {
-      //   const fileProgress = progress[files[0].path];
-      //   setIngestingProgress(Math.round((fileProgress.uploaded / fileProgress.total) * 100));
-      // },
-      OnComplete: () => {
-        setIngestingStep(2);
-      }
-    });
-
-    setObjectId(id);
-
-    if(streamWarnings.noAudio) setIngestingError("Warning: No audio streams found in file");
-    if(streamWarnings.noVideo) setIngestingError("Warning: No video streams found in file");
-    if(errors && errors.length) setIngestingError("Error: Unable to ingest selected media file.");
-
-    // await HandleIngest({
-    //   libraryId,
-    //   type,
-    //   hash,
-    //   masterObjectId: id
-    // });
-  };
-
-  const HandleIngest = async ({libraryId, type, hash, masterObjectId}) => {
-    await rootStore.ingestStore.CreateABRMezzanine({
-      libraryId,
-      type,
-      masterObjectId,
-      name: rootStore.editStore.Value(libraryId, "", "title"),
-      masterVersionHash: hash
+      encrypt: rootStore.editStore.Value(libraryId, "", "enable_drm") || false
     });
   };
 
@@ -118,17 +85,40 @@ const ContentCreation = observer(() => {
   };
 
   const SetIcon = (step) => {
-    if(ingestingStep === step) {
-      return (ingestingProgress === 100) ? CheckmarkIcon : LoadingIcon;
-    } else if(ingestingStep < step) {
-      return EllipsisIcon;
-    } else {
-      return CheckmarkIcon;
+    const ingestObject = toJS(rootStore.ingestStore.ingestObject);
+    if(!ingestObject) return null;
+
+    switch(step) {
+      case "upload":
+        return ingestObject.upload?.percentage === 100 ? CheckmarkIcon : LoadingIcon;
+      case "ingest":
+        if(ingestObject.currentStep === "ingest" || ingestObject.ingest.runState === "finished") {
+          return ingestObject.ingest?.percentage === 100 ? CheckmarkIcon : LoadingIcon;
+        } else {
+          return EllipsisIcon;
+        }
+      case "finalize":
+        if(ingestObject.currentStep === "finalize") {
+          return ingestObject.finalize.mezzanineHash ? CheckmarkIcon : LoadingIcon;
+        } else {
+          return EllipsisIcon;
+        }
     }
+  };
+
+  const IngestingErrors = () => {
+    const {errors, warnings} = toJS(rootStore.ingestStore.ingestErrors);
+
+    return (
+      [...errors, ...warnings].map((message, i) => (
+        <div className={`error-notification${message ? " visible" : ""}`} key={i}>{message}</div>
+      ))
+    );
   };
 
   const IngestView = () => {
     const ingestObject = toJS(rootStore.ingestStore.ingestObject) || {};
+    console.log("ingestObject", ingestObject);
 
     return (
       <React.Fragment>
@@ -142,32 +132,45 @@ const ContentCreation = observer(() => {
         <div className="file-details-steps progress">
           <div className="progress-step">
             <ImageIcon
-              icon={SetIcon(1)}
+              icon={SetIcon("upload")}
               className="progress-icon"
             />
             <span>Upload file</span>
-            <span>{`${ingestObject.uploadPercent}% Complete`}</span>
+            <span>{`${ingestObject.upload?.percentage}% Complete`}</span>
           </div>
 
-          <div className={`progress-step${ingestObject.uploadPercent < 100 ? " pending-step" : ""}`}>
+          <div className={`progress-step${ingestObject.currentStep === "upload" ? " pending-step" : ""}`}>
             <ImageIcon
-              icon={SetIcon(2)}
+              icon={SetIcon("ingest")}
               className="progress-icon"
             />
             <span>Convert to streaming format</span>
-            <span>{ingestObject.uploadPercent === 100 && `${ingestObject.ingestPercent || 0}% Complete`}</span>
+            <span>{ingestObject.currentStep === "ingest" && `${ingestObject.ingest?.percentage || 0}% Complete`}</span>
           </div>
 
-          <div className={`progress-step${(ingestObject.uploadPercent < 100 || !ingestObject.ingestRunState || ingestObject.ingestRunState !== "finished") ? " pending-step" : ""}`}>
+          <div className={`progress-step${(["upload", "ingest"].includes(ingestObject.currentStep)) ? " pending-step" : ""}`}>
             <ImageIcon
-              icon={SetIcon(3)}
+              icon={SetIcon("finalize")}
               className="progress-icon"
             />
             <span>Finalize</span>
             <span></span>
           </div>
         </div>
-        <div className={`error-notification${ingestingError ? " visible" : ""}`}>{ingestingError}</div>
+        { IngestingErrors() }
+        {
+          !!rootStore.ingestStore.ingestErrors.errors.length && <div className="actions-container form-actions">
+            <button
+              className="action action-primary"
+              onClick={() => {
+                rootStore.ingestStore.ResetIngestForm();
+                setFiles([]);
+              }}
+            >
+              Back
+            </button>
+          </div>
+        }
       </React.Fragment>
     );
   };
@@ -186,6 +189,7 @@ const ContentCreation = observer(() => {
             <input {...getInputProps()} />
           </div>
         </section>
+        <Preview file={files.length ? files[0] : {}} />
         <div>File selected: {files.length ? files[0].name : ""}</div>
         { IngestForm() }
       </React.Fragment>

@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     margin-top: 1.5rem;
+    width: 400px;
 
     .dropzone {
       align-items: center;
@@ -12,7 +13,7 @@
       flex-direction: column;
       height: 300px;
       justify-content: center;
-      width: 400px;
+      width: 100%;
       margin-bottom: 1.5rem;
 
       &.drag-active {
@@ -79,6 +80,31 @@
     &.visible {
       visibility: visible;
       margin-top: 2rem;
+    }
+  }
+
+  .file-preview {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    .thumbnail {
+      display: inline-flex;
+      height: 100px;
+      margin-right: 10px;
+      width: 100px;
+
+      .image-wrapper {
+        overflow: hidden;
+      }
+
+      img {
+        height: 100%;
+        object-fit: cover;
+        width: 100px;
+      }
     }
   }
 }
