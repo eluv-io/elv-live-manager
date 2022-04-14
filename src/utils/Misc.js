@@ -30,6 +30,18 @@ export const onEnterPressed = (fn) => {
   };
 };
 
+export const FormatHoursMinutesSeconds = (totalSeconds) => {
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor(totalSeconds % 3600 / 60);
+  const s = Math.floor(totalSeconds % 3600 % 60);
+
+  const hourDisplay = h > 0 ? h + (h === 1 ? " hour " : " hours ") : "";
+  const minuteDisplay = m > 0 ? m + (m === 1 ? " minute " : " minutes ") : "";
+  const secondDisplay = s > 0 ? s + (s === 1 ? " second" : " seconds") : "";
+
+  return hourDisplay + minuteDisplay + secondDisplay;
+};
+
 export const FormatPriceString = (price, currency, trimZeros) => {
   trimZeros=false;
 

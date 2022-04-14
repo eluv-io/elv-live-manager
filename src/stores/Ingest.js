@@ -4,6 +4,7 @@ import {FileInfo} from "../utils/Files";
 import {ValidateLibrary} from "@eluvio/elv-client-js/src/Validation";
 import abrProfileClear from "./abr-profile-clear.json";
 import {rootStore} from "./index";
+import {FormatHoursMinutesSeconds} from "../utils/Misc";
 const ABR = require("@eluvio/elv-abr-profile");
 const LRO = require("@eluvio/elv-lro-status");
 
@@ -74,7 +75,7 @@ class IngestStore {
     rootStore.editStore.SetValue(this.libraryId, "title");
   }
 
-  CreateProductionMaster = flow(function * ({libraryId, type, files, title, encrypt, callback}) {
+  CreateProductionMaster = flow(function * ({libraryId, type, files, title, encrypt, callback, CreateCallback}) {
     ValidateLibrary(libraryId);
 
     const fileInfo = yield FileInfo("", files);
@@ -87,6 +88,8 @@ class IngestStore {
     this.UpdateIngestObject({
       currentStep: "upload"
     });
+
+    if(CreateCallback && typeof CreateCallback === "function") CreateCallback();
 
     // Upload files
     yield this.client.UploadFiles({
@@ -133,10 +136,10 @@ class IngestStore {
       metadataSubtree: UrlJoin("production_master", "variants", "default", "streams")
     }));
 
-    if(!streams.audio) {
+    if(!streams?.audio) {
       this.UpdateIngestErrors("warnings", "Warning: No audio streams found in file.");
     }
-    if(!streams.video) {
+    if(!streams?.video) {
       this.UpdateIngestErrors("warnings", "Warning: No video streams found in file.")
     }
 
@@ -239,8 +242,7 @@ class IngestStore {
   });
 
   CreateABRMezzanine = flow(function * ({libraryId, masterObjectId, existingMezId, type, name, description, metadata, masterVersionHash, abrProfile, variant="default", offeringKey="default", writeToken}) {
-    try {
-      const createResponse = yield this.client.CreateABRMezzanine({
+    const createResponse = yield this.client.CreateABRMezzanine({
         libraryId,
         type,
         name: `${name} [ingest: transcoding] MEZ`,
@@ -250,11 +252,10 @@ class IngestStore {
         variant,
         offeringKey
       });
-      console.log("createResponse", createResponse)
+    const objectId = createResponse.id;
 
-      const objectId = createResponse.id;
-
-      const startResponse = yield this.client.StartABRMezzanineJobs({
+    try {
+      yield this.client.StartABRMezzanineJobs({
         libraryId,
         objectId
       });
@@ -266,21 +267,25 @@ class IngestStore {
         });
 
         if(statusMap === undefined) console.error("Received no job status information from server - object already finalized?");
-        const status = statusMap[startResponse.data[0]];
-        console.log('status', status);
 
         const enhancedStatus = LRO.EnhancedStatus(statusMap);
+        const lroPercentages = Object.keys(enhancedStatus.result.LROs || {}).map(lro => {
+          return enhancedStatus.result.LROs[lro].progress.percentage;
+        }) || [];
+        const totalPercent = Math.round((lroPercentages.reduce((a, b) => a + b, 0)) / lroPercentages.length);
 
-        console.log("enhancedStatus", enhancedStatus);
+        const {estimated_time_left_seconds, run_state} = enhancedStatus.result.summary;
+        const estimatedTimeLeft = typeof estimated_time_left_seconds === "number" ? FormatHoursMinutesSeconds(estimated_time_left_seconds) : estimated_time_left_seconds;
 
         this.UpdateIngestObject({
           ingest: {
-            runState: status.run_state,
-            percentage: status.progress.percentage
+            runState: enhancedStatus.result.summary.run_state,
+            percentage: totalPercent,
+            estimatedTimeLeft
           }
         });
 
-        if(status.run_state !== "running") {
+        if(run_state !== "running") {
           clearInterval(lroIntervalId);
 
           this.UpdateIngestObject({
@@ -294,7 +299,7 @@ class IngestStore {
         };
       }, 10000);
     } catch(error) {
-      console.log("Mez error", error)
+      console.error(error)
       this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file. Click the Back button below to try another file.");
 
       const {write_token} = yield this.client.EditContentObject({
@@ -304,8 +309,8 @@ class IngestStore {
 
       yield this.client.MergeMetadata({
         libraryId,
-        objectId: masterObjectId,
-        writeToken: write_token,
+        objectId,
+        writeToken: createResponse.write_token,
         metadata: {
           public: {
             name: `${name} [ingest: error] MASTER`,

@@ -14,10 +14,12 @@ import {rootStore} from "../../stores/index";
 import {toJS} from "mobx";
 import Preview from "./Preview";
 import UrlJoin from "url-join";
+import {Loader} from "../common/Loader";
 
 const ContentCreation = observer(() => {
   const [files, setFiles] = useState([]);
   const [disableDrm, setDisableDrm] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect( () => {
     if(!rootStore.ingestStore.libraryId) throw Error("Unable to find library ID");
@@ -59,13 +61,15 @@ const ContentCreation = observer(() => {
   });
 
   const HandleUpload = async () => {
+    setLoading(true);
     const libraryId = rootStore.ingestStore.libraryId;
     await rootStore.ingestStore.CreateProductionMaster({
       libraryId,
       type: "hq__KkgmjowhPqV6a4tSdNDfCccFA23RSSiSBggszF4p5s3u4evvZniFkn6fWtZ3AzfkFxxFmSoR2G",
       files,
       title: rootStore.editStore.Value(libraryId, "", "title") || file.name,
-      encrypt: rootStore.editStore.Value(libraryId, "", "enable_drm") || false
+      encrypt: rootStore.editStore.Value(libraryId, "", "enable_drm") || false,
+      CreateCallback: () => setLoading(false)
     });
   };
 
@@ -144,7 +148,7 @@ const ContentCreation = observer(() => {
       <React.Fragment>
         <div className="details-header">Your file is being ingested:</div>
         <div className="file-details">
-          <div>File: {files.length ? files[0].name : ""}</div>
+          <div>File: {files.length ? files[0].name || files[0].path : ""}</div>
           <div>Title: {rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title")}</div>
           <div>Use DRM: {rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "enable_drm") ? "yes" : "no"}</div>
         </div>
@@ -157,6 +161,7 @@ const ContentCreation = observer(() => {
             />
             <span>Upload file</span>
             <span>{`${ingestObject.upload?.percentage}% Complete`}</span>
+            <span></span>
           </div>
 
           <div className={`progress-step${ingestObject.currentStep === "upload" ? " pending-step" : ""}`}>
@@ -165,7 +170,8 @@ const ContentCreation = observer(() => {
               className="progress-icon"
             />
             <span>Convert to streaming format</span>
-            <span>{ingestObject.currentStep === "ingest" && `${ingestObject.ingest?.percentage || 0}% Complete`}</span>
+            <span>{["ingest", "finalize"].includes(ingestObject.currentStep) && `${ingestObject.ingest?.percentage || 0}% Complete`}</span>
+            <span>{ingestObject.ingest?.runState === "running" && `Estimated time left: ${ingestObject.ingest?.estimatedTimeLeft || "TBD"}`}</span>
           </div>
 
           <div className={`progress-step${(["upload", "ingest"].includes(ingestObject.currentStep)) ? " pending-step" : ""}`}>
@@ -175,11 +181,12 @@ const ContentCreation = observer(() => {
             />
             <span>Finalize</span>
             <span></span>
+            <span></span>
           </div>
         </div>
         { IngestingErrors() }
         {
-          !!rootStore.ingestStore.ingestErrors.errors.length && <div className="actions-container form-actions">
+          (!!rootStore.ingestStore.ingestErrors.errors.length || rootStore.ingestStore.ingestObject.finalize.mezzanineHash) && <div className="actions-container form-actions">
             <button
               className="action action-primary"
               onClick={() => {
@@ -218,14 +225,19 @@ const ContentCreation = observer(() => {
 
   return (
     <div className="page-content">
-      <div className="edit-page__header">
-        <h2 className="edit-page__header__text">Ingest Media File
-        </h2>
-      </div>
       {
-        rootStore.ingestStore.ingestObjectId ?
-          IngestView() :
-          FormView()
+        loading ? <Loader /> :
+          <React.Fragment>
+            <div className="edit-page__header">
+              <h2 className="edit-page__header__text">Ingest Media File
+              </h2>
+            </div>
+            {
+              rootStore.ingestStore.ingestObjectId ?
+                IngestView() :
+                FormView()
+            }
+          </React.Fragment>
       }
     </div>
   );
