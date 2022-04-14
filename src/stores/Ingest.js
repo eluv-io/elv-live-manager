@@ -8,18 +8,20 @@ const ABR = require("@eluvio/elv-abr-profile");
 const LRO = require("@eluvio/elv-lro-status");
 
 class IngestStore {
-  ingestObjectId = "";
+  ingestObjectId = undefined;
   ingestObjects = {};
   ingestErrors = {
     errors: [],
     warnings: []
   };
+  drmCert = undefined;
 
   constructor(rootStore) {
     makeAutoObservable(this, {
       client: computed,
       ingestObjects: observable,
-      ingestObject: computed
+      ingestObject: computed,
+      hasDrmCert: computed
     });
 
     this.rootStore = rootStore;
@@ -30,6 +32,10 @@ class IngestStore {
     return this.rootStore.client;
   }
 
+  get hasDrmCert() {
+    return this.drmCert;
+  }
+
   get ingestObject() {
     return this.ingestObjects[this.ingestObjectId];
   }
@@ -38,7 +44,7 @@ class IngestStore {
     return this.ingestErrors;
   }
 
-  UpdateIngestObject(data) {
+  UpdateIngestObject = (data) => {
     if(!this.ingestObjects[this.ingestObjectId]) {
       this.ingestObjects[this.ingestObjectId] = {
         currentStep: "",
@@ -184,44 +190,50 @@ class IngestStore {
 
   CreateABRLadder = flow(function * ({libraryId, objectId, writeToken}) {
     try {
-      const masterMetadata = yield this.client.ContentObjectMetadata({
+      const {qid} = yield this.client.ContentLibrary({libraryId});
+      const libABRMetadata = yield this.client.ContentObjectMetadata({
+        libraryId: yield this.client.ContentObjectLibraryId({objectId: qid}),
+        objectId: qid,
+        metadataSubtree: "/abr"
+      });
+
+      if(!libABRMetadata || !libABRMetadata.default_profile || !libABRMetadata.mez_content_type) {
+        this.UpdateIngestErrors("errors", "Error: Library is not set up for ingesting media files.");
+        return;
+      }
+
+      const {production_master} = yield this.client.ContentObjectMetadata({
         libraryId,
         objectId,
         writeToken,
-        metadataSubtree: "/production_master"
+        select: [
+          "production_master/sources",
+          "production_master/variants/default"
+        ]
       });
 
-      // Needed when default profile can be found in library meta
-      // const {qid} = yield this.client.ContentLibrary({libraryId});
-      // const parentLibraryId = yield this.client.ContentObjectLibraryId({
-      //   objectId: qid
-      // });
-      // const libABRMetadata = yield this.client.ContentObjectMetadata({
-      //   libraryId: parentLibraryId,
-      //   objectId: qid,
-      //   metadataSubtree: "/abr"
-      // });
-
-      const libABRMetadata = abrProfileClear.abr;
-      const contentTypeId = libABRMetadata.mez_content_type || "hq__KkgmjowhPqV6a4tSdNDfCccFA23RSSiSBggszF4p5s3u4evvZniFkn6fWtZ3AzfkFxxFmSoR2G";
-      const libABRProfile = libABRMetadata.default_abr_profile;
+      if(!production_master || !production_master.sources || !production_master.variants || !production_master.variants.default) {
+        this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile. Click the Back button below to try another file.");
+        return;
+      }
 
       const generatedProfile = ABR.ABRProfileForVariant(
-        masterMetadata.sources,
-        masterMetadata.variants.default,
-        libABRProfile
+        production_master.sources,
+        production_master.variants.default,
+        libABRMetadata.default_profile
       );
 
       if(!generatedProfile.ok) {
         this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile. Click the Back button below to try another file.");
+        return;
       }
 
       return {
         abrProfile: generatedProfile.result,
-        contentTypeId
+        contentTypeId: libABRMetadata.mez_content_type
       };
     } catch(error) {
-      console.log("error", error);
+      console.error(error);
       this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile. Click the Back button below to try another file.");
     }
   });

@@ -8,16 +8,34 @@ import PictureIcon from "../../static/icons/image.svg";
 import LoadingIcon from "../../static/icons/loading.gif";
 import CheckmarkIcon from "../../static/icons/check.svg";
 import EllipsisIcon from "../../static/icons/ellipsis.svg";
+import ErrorIcon from "../../static/icons/circle-exclamation.svg";
 
 import {rootStore} from "../../stores/index";
 import {toJS} from "mobx";
 import Preview from "./Preview";
+import UrlJoin from "url-join";
 
 const ContentCreation = observer(() => {
   const [files, setFiles] = useState([]);
+  const [disableDrm, setDisableDrm] = useState(false);
 
-  useEffect(() => {
+  useEffect( () => {
     if(!rootStore.ingestStore.libraryId) throw Error("Unable to find library ID");
+
+    const GetDrmCert = async () => {
+      if(!rootStore.ingestStore.client) return;
+      const response = await rootStore.ingestStore.client.ContentLibrary({
+        libraryId: rootStore.ingestStore.libraryId
+      });
+      const drmCert = await rootStore.ingestStore.client.ContentObjectMetadata({
+        libraryId: rootStore.ingestStore.libraryId,
+        objectId: response.qid,
+        metadataSubtree: UrlJoin("elv", "media", "drm", "fps", "cert")
+      });
+      return !!drmCert;
+    };
+
+    setDisableDrm(GetDrmCert());
   }, []);
 
   const HandleFiles = (files) => {
@@ -70,6 +88,7 @@ const ContentCreation = observer(() => {
             label="Use Digital Right Management (DRM) copy protection during playback"
             name="enable_drm"
             path=""
+            disabled={disableDrm}
           />
         </div>
         <button
@@ -92,7 +111,9 @@ const ContentCreation = observer(() => {
       case "upload":
         return ingestObject.upload?.percentage === 100 ? CheckmarkIcon : LoadingIcon;
       case "ingest":
-        if(ingestObject.currentStep === "ingest" || ingestObject.ingest.runState === "finished") {
+        if(rootStore.ingestStore.ingestErrors.errors.length) {
+          return ErrorIcon;
+        } else if(ingestObject.currentStep === "ingest" || ingestObject.ingest.runState === "finished") {
           return ingestObject.ingest?.percentage === 100 ? CheckmarkIcon : LoadingIcon;
         } else {
           return EllipsisIcon;
@@ -117,8 +138,7 @@ const ContentCreation = observer(() => {
   };
 
   const IngestView = () => {
-    const ingestObject = toJS(rootStore.ingestStore.ingestObject) || {};
-    console.log("ingestObject", ingestObject);
+    let ingestObject = toJS(rootStore.ingestStore.ingestObject) || {};
 
     return (
       <React.Fragment>
