@@ -1,10 +1,8 @@
-import {autorun, computed, flow, makeAutoObservable, observable} from "mobx";
+import {computed, flow, makeAutoObservable, observable} from "mobx";
 import UrlJoin from "url-join";
 import {FileInfo} from "../utils/Files";
 import {ValidateLibrary} from "@eluvio/elv-client-js/src/Validation";
-import abrProfileClear from "./abr-profile-clear.json";
 import {rootStore} from "./index";
-import {FormatHoursMinutesSeconds} from "../utils/Misc";
 const ABR = require("@eluvio/elv-abr-profile");
 const LRO = require("@eluvio/elv-lro-status");
 
@@ -125,6 +123,7 @@ class IngestStore {
     });
 
     if(errors) {
+      console.error(errors);
       this.UpdateIngestErrors("errors", "Error: Unable to ingest selected media file. Click the Back button below to try another file.");
     }
 
@@ -260,44 +259,47 @@ class IngestStore {
         objectId
       });
 
-      const lroIntervalId = setInterval(async () => {
-        const statusMap = await this.client.LROStatus({
+      let done;
+      let statusIntervalId;
+
+      while(!done) {
+        let statusMap = yield this.client.LROStatus({
           libraryId,
           objectId
         });
 
         if(statusMap === undefined) console.error("Received no job status information from server - object already finalized?");
 
-        const enhancedStatus = LRO.EnhancedStatus(statusMap);
-        const lroPercentages = Object.keys(enhancedStatus.result.LROs || {}).map(lro => {
-          return enhancedStatus.result.LROs[lro].progress.percentage;
-        }) || [];
-        const totalPercent = Math.round((lroPercentages.reduce((a, b) => a + b, 0)) / lroPercentages.length);
+        if(statusIntervalId) clearInterval(statusIntervalId);
+        statusIntervalId = setInterval(() => {
+          let enhancedStatus = LRO.EnhancedStatus(statusMap);
 
-        const {estimated_time_left_seconds, run_state} = enhancedStatus.result.summary;
-        const estimatedTimeLeft = typeof estimated_time_left_seconds === "number" ? FormatHoursMinutesSeconds(estimated_time_left_seconds) : estimated_time_left_seconds;
-
-        this.UpdateIngestObject({
-          ingest: {
-            runState: enhancedStatus.result.summary.run_state,
-            percentage: totalPercent,
-            estimatedTimeLeft
-          }
-        });
-
-        if(run_state !== "running") {
-          clearInterval(lroIntervalId);
+          const {estimated_time_left_seconds, estimated_time_left_h_m_s, run_state} = enhancedStatus.result.summary;
 
           this.UpdateIngestObject({
-            currentStep: "finalize"
+            ingest: {
+              runState: enhancedStatus.result.summary.run_state,
+              estimatedTimeLeft: estimated_time_left_h_m_s || estimated_time_left_seconds
+            }
           });
 
-          this.FinalizeABRMezzanine({
-            libraryId,
-            objectId
-          });
-        };
-      }, 10000);
+          if(run_state !== "running") {
+            clearInterval(statusIntervalId);
+            done = true;
+
+            this.UpdateIngestObject({
+              currentStep: "finalize"
+            });
+
+            this.FinalizeABRMezzanine({
+              libraryId,
+              objectId
+            });
+          };
+        }, 1000);
+
+        yield new Promise(res => setTimeout(res, 15000));
+      }
     } catch(error) {
       console.error(error)
       this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file. Click the Back button below to try another file.");
@@ -347,6 +349,7 @@ class IngestStore {
         }
       });
     } catch(error) {
+      console.error(error);
       this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file. Click the Back button below to try another file.");
     }
   });

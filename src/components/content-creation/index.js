@@ -55,7 +55,7 @@ const ContentCreation = observer(() => {
     getInputProps,
     isDragActive
   } = useDropzone({
-    // accept: "audio/*, video/*, image/*",
+    accept: "audio/*, video/*, image/*",
     multiple: false,
     onDrop: HandleFiles
   });
@@ -118,7 +118,7 @@ const ContentCreation = observer(() => {
         if(rootStore.ingestStore.ingestErrors.errors.length) {
           return ErrorIcon;
         } else if(ingestObject.currentStep === "ingest" || ingestObject.ingest.runState === "finished") {
-          return ingestObject.ingest?.percentage === 100 ? CheckmarkIcon : LoadingIcon;
+          return ingestObject.ingest?.runState === "finished" ? CheckmarkIcon : LoadingIcon;
         } else {
           return EllipsisIcon;
         }
@@ -152,16 +152,15 @@ const ContentCreation = observer(() => {
           <div>Title: {rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title")}</div>
           <div>Use DRM: {rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "enable_drm") ? "yes" : "no"}</div>
         </div>
-        <div className="details-header">Progress:</div>
+        <div className="details-header">Steps:</div>
         <div className="file-details-steps progress">
           <div className="progress-step">
             <ImageIcon
               icon={SetIcon("upload")}
               className="progress-icon"
             />
-            <span>Upload file</span>
+            <span>Uploading file</span>
             <span>{`${ingestObject.upload?.percentage}% Complete`}</span>
-            <span></span>
           </div>
 
           <div className={`progress-step${ingestObject.currentStep === "upload" ? " pending-step" : ""}`}>
@@ -169,8 +168,7 @@ const ContentCreation = observer(() => {
               icon={SetIcon("ingest")}
               className="progress-icon"
             />
-            <span>Convert to streaming format</span>
-            <span>{["ingest", "finalize"].includes(ingestObject.currentStep) && `${ingestObject.ingest?.percentage || 0}% Complete`}</span>
+            <span>Converting to streaming format</span>
             <span>{ingestObject.ingest?.runState === "running" && `Estimated time left: ${ingestObject.ingest?.estimatedTimeLeft || "TBD"}`}</span>
           </div>
 
@@ -179,8 +177,7 @@ const ContentCreation = observer(() => {
               icon={SetIcon("finalize")}
               className="progress-icon"
             />
-            <span>Finalize</span>
-            <span></span>
+            <span>Finalizing</span>
             <span></span>
           </div>
         </div>
