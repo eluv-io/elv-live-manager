@@ -34,10 +34,11 @@ const ContentCreation = observer(() => {
         objectId: response.qid,
         metadataSubtree: UrlJoin("elv", "media", "drm", "fps", "cert")
       });
-      return !!drmCert;
+
+      setDisableDrm(!drmCert);
     };
 
-    setDisableDrm(GetDrmCert());
+    GetDrmCert();
   }, []);
 
   const HandleFiles = (files) => {

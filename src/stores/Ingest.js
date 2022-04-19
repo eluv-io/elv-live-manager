@@ -161,7 +161,7 @@ class IngestStore {
     });
 
     // Create ABR Ladder
-    const {abrProfile, contentTypeId} = yield this.CreateABRLadder({
+    let {abrProfile, contentTypeId} = yield this.CreateABRLadder({
       libraryId,
       objectId: id,
       writeToken: write_token
@@ -179,6 +179,19 @@ class IngestStore {
     this.UpdateIngestObject({
       currentStep: "ingest"
     });
+
+    let abrProfileExclude;
+    if(encrypt) {
+      abrProfileExclude = ABR.ProfileExcludeClear(abrProfile);
+    } else {
+      abrProfileExclude = ABR.ProfileExcludeDRM(abrProfile);
+    }
+
+    if(abrProfileExclude.ok) {
+      abrProfile = abrProfileExclude.result;
+    } else {
+      this.UpdateIngestErrors("errors", "Error: ABR Profile has no relevant playout formats.")
+    }
 
     this.CreateABRMezzanine({
       libraryId,
@@ -272,7 +285,8 @@ class IngestStore {
 
         if(statusIntervalId) clearInterval(statusIntervalId);
         statusIntervalId = setInterval(() => {
-          let enhancedStatus = LRO.EnhancedStatus(statusMap);
+          const currentTime = new Date();
+          const enhancedStatus = LRO.EnhancedStatus(statusMap, currentTime);
 
           const {estimated_time_left_seconds, estimated_time_left_h_m_s, run_state} = enhancedStatus.result.summary;
 
