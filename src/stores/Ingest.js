@@ -13,14 +13,12 @@ class IngestStore {
     errors: [],
     warnings: []
   };
-  drmCert = undefined;
 
   constructor(rootStore) {
     makeAutoObservable(this, {
       client: computed,
       ingestObjects: observable,
-      ingestObject: computed,
-      hasDrmCert: computed
+      ingestObject: computed
     });
 
     this.rootStore = rootStore;
@@ -29,10 +27,6 @@ class IngestStore {
 
   get client() {
     return this.rootStore.client;
-  }
-
-  get hasDrmCert() {
-    return this.drmCert;
   }
 
   get ingestObject() {
@@ -152,7 +146,7 @@ class IngestStore {
           name: `${title} [ingest: uploading] MASTER`,
           description: "",
           asset_metadata: {
-            title
+            display_title: `${title} [ingest: uploading] MASTER`
           }
         },
         reference: true,
@@ -165,6 +159,24 @@ class IngestStore {
       libraryId,
       objectId: id,
       writeToken: write_token
+    });
+
+    // Update name to remove [ingest: uploading]
+    yield this.client.MergeMetadata({
+      libraryId,
+      objectId: id,
+      writeToken: write_token,
+      metadata: {
+        public: {
+          name: `${title} MASTER`,
+          description: "",
+          asset_metadata: {
+            display_title: `${title} MASTER`
+          }
+        },
+        reference: true,
+        elv_created_at: new Date().getTime()
+      },
     });
 
     // Finalize object
@@ -267,7 +279,7 @@ class IngestStore {
     const objectId = createResponse.id;
 
     try {
-      yield this.client.StartABRMezzanineJobs({
+      const { writeToken } = yield this.client.StartABRMezzanineJobs({
         libraryId,
         objectId
       });
@@ -284,7 +296,7 @@ class IngestStore {
         if(statusMap === undefined) console.error("Received no job status information from server - object already finalized?");
 
         if(statusIntervalId) clearInterval(statusIntervalId);
-        statusIntervalId = setInterval(() => {
+        statusIntervalId = setInterval( async () => {
           const currentTime = new Date();
           const enhancedStatus = LRO.EnhancedStatus(statusMap, currentTime);
 
@@ -301,13 +313,26 @@ class IngestStore {
             clearInterval(statusIntervalId);
             done = true;
 
-            this.UpdateIngestObject({
-              currentStep: "finalize"
+            await this.client.MergeMetadata({
+              libraryId,
+              objectId,
+              writeToken,
+              metadata: {
+                public: {
+                  name: `${name} MEZ`,
+                  description: "",
+                  asset_metadata: {
+                    display_title: `${name} MEZ`
+                  }
+                }
+              }
             });
 
             this.FinalizeABRMezzanine({
               libraryId,
-              objectId
+              objectId,
+              writeToken,
+              name
             });
           };
         }, 1000);
@@ -332,7 +357,7 @@ class IngestStore {
             name: `${name} [ingest: error] MASTER`,
             description: "Unable to transcode file.",
             asset_metadata: {
-              name
+              display_title: `${name} [ingest: error] MASTER`
             }
           },
           reference: true,
@@ -351,6 +376,10 @@ class IngestStore {
   });
 
   FinalizeABRMezzanine = flow(function * ({libraryId, objectId}) {
+    this.UpdateIngestObject({
+      currentStep: "finalize"
+    });
+
     try {
       const finalizeAbrResponse = yield this.client.FinalizeABRMezzanine({
         libraryId,
