@@ -305,7 +305,7 @@ class IngestStore {
           this.UpdateIngestObject({
             ingest: {
               runState: enhancedStatus.result.summary.run_state,
-              estimatedTimeLeft: estimated_time_left_h_m_s || estimated_time_left_seconds
+              estimatedTimeLeft: !estimated_time_left_seconds ? "Estimating time to complete..." : estimated_time_left_h_m_s
             }
           });
 
