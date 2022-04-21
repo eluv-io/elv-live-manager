@@ -67,6 +67,22 @@ class IngestStore {
     rootStore.editStore.SetValue(this.libraryId, "title");
   }
 
+  WaitForPublish = flow (function * ({latestHash, libraryId, objectId}) {
+    let publishFinished = false;
+    let latestObjectData = {};
+    while(!publishFinished) {
+      latestObjectData = yield this.client.ContentObject({
+        libraryId, objectId
+      });
+
+      if(latestObjectData.hash === latestHash) {
+        publishFinished = true;
+      } else {
+        yield new Promise(resolve => setTimeout(resolve, 15000));
+      }
+    }
+  });
+
   CreateProductionMaster = flow(function * ({libraryId, type, files, title, encrypt, callback, CreateCallback}) {
     ValidateLibrary(libraryId);
 
@@ -129,12 +145,14 @@ class IngestStore {
       metadataSubtree: UrlJoin("production_master", "variants", "default", "streams")
     }));
 
-    if(!streams?.audio) {
-      this.UpdateIngestErrors("warnings", "Warning: No audio streams found in file.");
-    }
-    if(!streams?.video) {
-      this.UpdateIngestErrors("warnings", "Warning: No video streams found in file.")
-    }
+    console.log("streams", streams)
+
+    this.UpdateIngestObject({
+      upload: {
+        ...this.ingestObject.upload,
+        streams: Object.keys(streams || {})
+      }
+    });
 
     // Merge metadata
     yield this.client.MergeMetadata({
@@ -278,8 +296,20 @@ class IngestStore {
       });
     const objectId = createResponse.id;
 
+    yield this.WaitForPublish({
+      latestHash: createResponse.hash,
+      libraryId,
+      objectId
+    });
+
     try {
-      const { writeToken } = yield this.client.StartABRMezzanineJobs({
+      const { writeToken, hash } = yield this.client.StartABRMezzanineJobs({
+        libraryId,
+        objectId
+      });
+
+      yield this.WaitForPublish({
+        latestHash: hash,
         libraryId,
         objectId
       });
@@ -305,7 +335,7 @@ class IngestStore {
           this.UpdateIngestObject({
             ingest: {
               runState: enhancedStatus.result.summary.run_state,
-              estimatedTimeLeft: !estimated_time_left_seconds ? "Estimating time to complete..." : estimated_time_left_h_m_s
+              estimatedTimeLeft: !estimated_time_left_seconds ? "Calculating time to complete..." : estimated_time_left_h_m_s
             }
           });
 
@@ -337,7 +367,7 @@ class IngestStore {
           };
         }, 1000);
 
-        yield new Promise(res => setTimeout(res, 15000));
+        yield new Promise(resolve => setTimeout(resolve, 15000));
       }
     } catch(error) {
       console.error(error)
