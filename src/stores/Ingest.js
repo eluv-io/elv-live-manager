@@ -70,6 +70,28 @@ class IngestStore {
     rootStore.editStore.SetValue(this.libraryId, "display_name");
   }
 
+  CreateLink({targetHash, linkTarget="/meta/public/asset_metadata", options={}}) {
+    if(!targetHash) {
+      return {
+        ...options,
+        ".": {
+          ...(options["."] || {}),
+          "auto_update":{"tag":"latest"}
+        },
+        "/": UrlJoin("./", linkTarget)
+      };
+    } else {
+      return {
+        ...options,
+        ".": {
+          ...(options["."] || {}),
+          "auto_update":{"tag":"latest"}
+        },
+        "/": UrlJoin("/qfab", targetHash, linkTarget)
+      };
+    }
+  }
+
   NetworkInfo = flow (function * () {
     return yield this.client.NetworkInfo();
   });
@@ -90,13 +112,20 @@ class IngestStore {
     }
   });
 
-  CreateProductionMaster = flow(function * ({libraryId, type, files, title, encrypt, description, displayName, images, callback, CreateCallback}) {
+  CreateProductionMaster = flow(function * ({libraryId, files, title, encrypt, description, displayName, images, callback, CreateCallback}) {
     ValidateLibrary(libraryId);
 
     const fileInfo = yield FileInfo("", files);
+    const {qid} = yield this.client.ContentLibrary({libraryId});
+    const libABRMetadata = yield this.client.ContentObjectMetadata({
+      libraryId: yield this.client.ContentObjectLibraryId({objectId: qid}),
+      objectId: qid,
+      metadataSubtree: "/abr"
+    });
+
     const {id, write_token} = yield this.client.CreateContentObject({
       libraryId,
-      options: type ? { type } : {}
+      options: libABRMetadata.mez_content_type ? { type: libABRMetadata.mez_content_type } : {}
     });
 
     this.ingestObjectId = id;
@@ -165,6 +194,10 @@ class IngestStore {
       }
     });
 
+    this.UpdateIngestObject({
+      currentStep: "ingest"
+    });
+
     // Merge metadata
     yield this.client.MergeMetadata({
       libraryId,
@@ -217,10 +250,6 @@ class IngestStore {
       awaitCommitConfirmation: false
     });
 
-    this.UpdateIngestObject({
-      currentStep: "ingest"
-    });
-
     let abrProfileExclude;
     if(encrypt) {
       abrProfileExclude = ABR.ProfileExcludeClear(abrProfile);
@@ -243,7 +272,8 @@ class IngestStore {
       description: description,
       displayName,
       masterVersionHash: finalizeResponse.hash,
-      abrProfile
+      abrProfile,
+      images
     });
   });
 
@@ -306,6 +336,7 @@ class IngestStore {
     description,
     displayName,
     metadata,
+    images,
     masterVersionHash,
     abrProfile,
     variant="default",
@@ -347,6 +378,28 @@ class IngestStore {
         libraryId,
         objectId
       });
+
+      yield this.client.UploadFiles({
+        libraryId,
+        objectId: createResponse.id,
+        writeToken,
+        fileInfo: yield FileInfo("", images),
+        encryption: "none"
+      });
+
+      // Upload image and use as
+      const filesMetadata = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId: createResponse.id,
+        writeToken,
+        metadataSubtree: "/files"
+      });
+      const imagePath = Object.keys(filesMetadata).find(key => key !== ".")
+
+      const image = "https://demov3.net955210.contentfabric.io/s/demov3" + this.CreateLink({
+        targetHash: hash,
+        linkTarget: UrlJoin("files", imagePath)
+      })["/"];
 
       let done;
       let statusIntervalId;
@@ -399,9 +452,10 @@ class IngestStore {
                         description,
                         created_at: new Date(),
                         playable: true,
-                        hasAudio: this.ingestObject.upload.streams.includes("audio"),
+                        has_audio: this.ingestObject.upload.streams.includes("audio"),
                         embed_url: embedUrl,
-                        external_url: embedUrl
+                        external_url: embedUrl,
+                        image
                       }
                   }
                 }

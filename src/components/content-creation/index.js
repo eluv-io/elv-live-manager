@@ -73,17 +73,9 @@ const ContentCreation = observer(() => {
     setLoading(true);
     try {
       const libraryId = rootStore.ingestStore.libraryId;
-      // const imageResponse = await rootStore.ingestStore.CreateProductionMaster({
-      //   libraryId,
-      //   type: "hq__KkgmjowhPqV6a4tSdNDfCccFA23RSSiSBggszF4p5s3u4evvZniFkn6fWtZ3AzfkFxxFmSoR2G",
-      //   files: images,
-      //   title: `${title} image`,
-      // });
-      // console.log("image response", imageResponse)
 
       await rootStore.ingestStore.CreateProductionMaster({
         libraryId,
-        type: "hq__KkgmjowhPqV6a4tSdNDfCccFA23RSSiSBggszF4p5s3u4evvZniFkn6fWtZ3AzfkFxxFmSoR2G",
         files,
         title: rootStore.editStore.Value(libraryId, "", "title") || file.name,
         encrypt: rootStore.editStore.Value(libraryId, "", "enable_drm") || false,
