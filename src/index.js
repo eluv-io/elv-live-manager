@@ -2,7 +2,7 @@ import "Assets/stylesheets/app.scss";
 
 import React from "react";
 import { render } from "react-dom";
-import { observer} from "mobx-react";
+import { observer } from "mobx-react";
 import {rootStore} from "Stores";
 
 window.js = content => console.log(JSON.stringify(content, null, 2));
@@ -20,6 +20,7 @@ import Events from "Components/events";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import LuxonUtils from "@date-io/luxon";
 import Breadcrumbs from "Components/navigation/Breadcrumbs";
+import ContentCreation from "./components/content-creation";
 
 const Placeholder = ({ text }) => <div>{text}</div>;
 
@@ -43,6 +44,9 @@ const Routes = () => {
       </Route>
       <Route path="/media">
         <Placeholder text="Media" />
+      </Route>
+      <Route path="/ingest">
+        <ContentCreation />
       </Route>
       <Route path="*">
         <Redirect to="/" />

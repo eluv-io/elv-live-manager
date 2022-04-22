@@ -72,7 +72,8 @@ module.exports = {
       Utils: Path.resolve(__dirname, "src/utils"),
       // Force webpack to use *one* copy of bn.js instead of 8
       "bn.js": Path.resolve(Path.join(__dirname, "node_modules", "bn.js")),
-      "@eluvio/elv-client-js$": "@eluvio/elv-client-js/dist/ElvClient-min.js"
+      "@eluvio/elv-client-js$": "@eluvio/elv-client-js/dist/ElvClient-min.js",
+      "@eluvio/elv-lro-status": "@eluvio/elv-lro-status/src/ElvLROStatus.js"
     },
     extensions: [".js", ".jsx", ".scss", ".png", ".svg"],
     fallback: {
