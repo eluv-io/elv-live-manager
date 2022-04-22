@@ -112,7 +112,7 @@ class IngestStore {
     }
   });
 
-  CreateProductionMaster = flow(function * ({libraryId, files, title, encrypt, description, displayName, images, callback, CreateCallback}) {
+  CreateProductionMaster = flow(function * ({libraryId, files, title, encrypt, description, displayName, images=[], callback, CreateCallback}) {
     ValidateLibrary(libraryId);
 
     const fileInfo = yield FileInfo("", files);
@@ -265,7 +265,7 @@ class IngestStore {
 
     this.CreateABRMezzanine({
       libraryId,
-      existingMezId: finalizeResponse.id,
+      objectId: finalizeResponse.id,
       masterObjectId: finalizeResponse.id,
       type: contentTypeId,
       name: title,
@@ -330,13 +330,12 @@ class IngestStore {
   CreateABRMezzanine = flow(function * ({
     libraryId,
     masterObjectId,
-    existingMezId,
     type,
     name,
     description,
     displayName,
     metadata,
-    images,
+    images=[],
     masterVersionHash,
     abrProfile,
     variant="default",
@@ -348,7 +347,7 @@ class IngestStore {
         type,
         name: `${name} [ingest: transcoding] MEZ`,
         masterVersionHash,
-        existingMezId,
+        objectId: masterObjectId,
         abrProfile,
         variant,
         offeringKey
@@ -379,27 +378,30 @@ class IngestStore {
         objectId
       });
 
-      yield this.client.UploadFiles({
-        libraryId,
-        objectId: createResponse.id,
-        writeToken,
-        fileInfo: yield FileInfo("", images),
-        encryption: "none"
-      });
+      let image;
+      if(images.length) {
+        yield this.client.UploadFiles({
+          libraryId,
+          objectId: createResponse.id,
+          writeToken,
+          fileInfo: yield FileInfo("", images),
+          encryption: "none"
+        });
 
-      // Upload image and use as
-      const filesMetadata = yield this.client.ContentObjectMetadata({
-        libraryId,
-        objectId: createResponse.id,
-        writeToken,
-        metadataSubtree: "/files"
-      });
-      const imagePath = Object.keys(filesMetadata).find(key => key !== ".")
+        // Upload image and create link for metadata
+        const filesMetadata = yield this.client.ContentObjectMetadata({
+          libraryId,
+          objectId: createResponse.id,
+          writeToken,
+          metadataSubtree: "/files"
+        });
+        const imagePath = Object.keys(filesMetadata).find(key => key !== ".")
 
-      const image = "https://demov3.net955210.contentfabric.io/s/demov3" + this.CreateLink({
-        targetHash: hash,
-        linkTarget: UrlJoin("files", imagePath)
-      })["/"];
+        image = "https://demov3.net955210.contentfabric.io/s/demov3" + this.CreateLink({
+          targetHash: hash,
+          linkTarget: UrlJoin("files", imagePath)
+        })["/"];
+      }
 
       let done;
       let statusIntervalId;

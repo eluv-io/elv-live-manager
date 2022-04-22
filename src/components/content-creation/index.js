@@ -96,17 +96,6 @@ const ContentCreation = observer(() => {
       <Form className="ingest-form">
         <div className="form__section">
           <h2 className="form__section__header">
-            Price
-          </h2>
-          <Input
-            name="price"
-            label="Amount"
-            // objectId={objectId}
-            path=""
-            placeholder="$100"
-          />
-
-          <h2 className="form__section__header">
             About
           </h2>
           <Input
