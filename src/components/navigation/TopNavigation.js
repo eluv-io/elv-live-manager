@@ -15,7 +15,7 @@ const TopNavigation = () => {
       <NavLink className="navigation__link" to="/marketplaces">Marketplaces</NavLink>
       <NavLink className="navigation__link" to="/nfts">NFTs</NavLink>
       <NavLink className="navigation__link" to="/media">Media</NavLink>
-      <NavLink className="navigation__link" to="/ingest">Content Creation</NavLink>
+      <NavLink className="navigation__link" to="/ingest">Create NFT</NavLink>
     </nav>
   );
 };

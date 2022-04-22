@@ -3,6 +3,7 @@ import UrlJoin from "url-join";
 import {FileInfo} from "../utils/Files";
 import {ValidateLibrary} from "@eluvio/elv-client-js/src/Validation";
 import {rootStore} from "./index";
+import {GenerateEmbedUrl} from "../components/content-creation/EmbedPlayer";
 const ABR = require("@eluvio/elv-abr-profile");
 const LRO = require("@eluvio/elv-lro-status");
 
@@ -65,7 +66,13 @@ class IngestStore {
     };
     rootStore.editStore.SetValue(this.libraryId, "enable_drm");
     rootStore.editStore.SetValue(this.libraryId, "title");
+    rootStore.editStore.SetValue(this.libraryId, "description");
+    rootStore.editStore.SetValue(this.libraryId, "display_name");
   }
+
+  NetworkInfo = flow (function * () {
+    return yield this.client.NetworkInfo();
+  });
 
   WaitForPublish = flow (function * ({latestHash, libraryId, objectId}) {
     let publishFinished = false;
@@ -83,7 +90,7 @@ class IngestStore {
     }
   });
 
-  CreateProductionMaster = flow(function * ({libraryId, type, files, title, encrypt, callback, CreateCallback}) {
+  CreateProductionMaster = flow(function * ({libraryId, type, files, title, encrypt, description, displayName, images, callback, CreateCallback}) {
     ValidateLibrary(libraryId);
 
     const fileInfo = yield FileInfo("", files);
@@ -98,6 +105,9 @@ class IngestStore {
     });
 
     if(CreateCallback && typeof CreateCallback === "function") CreateCallback();
+
+    // Create encryption conk
+    yield this.client.CreateEncryptionConk({libraryId, objectId: id, writeToken: write_token, createKMSConk: true});
 
     // Upload files
     yield this.client.UploadFiles({
@@ -117,8 +127,11 @@ class IngestStore {
       encryption: encrypt ? "cgck" : "none"
     });
 
-    // Create encryption conk
-    yield this.client.CreateEncryptionConk({libraryId, objectId: id, writeToken: write_token, createKMSConk: true});
+    // Set public permission
+    yield this.client.SetPermission({
+      objectId: id,
+      permission: "public"
+    })
 
     // Bitcode method
     const {errors} = yield this.client.CallBitcodeMethod({
@@ -145,8 +158,6 @@ class IngestStore {
       metadataSubtree: UrlJoin("production_master", "variants", "default", "streams")
     }));
 
-    console.log("streams", streams)
-
     this.UpdateIngestObject({
       upload: {
         ...this.ingestObject.upload,
@@ -162,7 +173,7 @@ class IngestStore {
       metadata: {
         public: {
           name: `${title} [ingest: uploading] MASTER`,
-          description: "",
+          description,
           asset_metadata: {
             display_title: `${title} [ingest: uploading] MASTER`
           }
@@ -187,7 +198,7 @@ class IngestStore {
       metadata: {
         public: {
           name: `${title} MASTER`,
-          description: "",
+          description,
           asset_metadata: {
             display_title: `${title} MASTER`
           }
@@ -225,9 +236,12 @@ class IngestStore {
 
     this.CreateABRMezzanine({
       libraryId,
+      existingMezId: finalizeResponse.id,
       masterObjectId: finalizeResponse.id,
       type: contentTypeId,
       name: title,
+      description: description,
+      displayName,
       masterVersionHash: finalizeResponse.hash,
       abrProfile
     });
@@ -283,7 +297,21 @@ class IngestStore {
     }
   });
 
-  CreateABRMezzanine = flow(function * ({libraryId, masterObjectId, existingMezId, type, name, description, metadata, masterVersionHash, abrProfile, variant="default", offeringKey="default", writeToken}) {
+  CreateABRMezzanine = flow(function * ({
+    libraryId,
+    masterObjectId,
+    existingMezId,
+    type,
+    name,
+    description,
+    displayName,
+    metadata,
+    masterVersionHash,
+    abrProfile,
+    variant="default",
+    offeringKey="default",
+    writeToken
+  }) {
     const createResponse = yield this.client.CreateABRMezzanine({
         libraryId,
         type,
@@ -300,6 +328,12 @@ class IngestStore {
       latestHash: createResponse.hash,
       libraryId,
       objectId
+    });
+
+    // Set public permission
+    yield this.client.SetPermission({
+      objectId,
+      permission: "public"
     });
 
     try {
@@ -343,6 +377,12 @@ class IngestStore {
             clearInterval(statusIntervalId);
             done = true;
 
+            const embedUrl = GenerateEmbedUrl({
+              objectId: this.ingestObjectId,
+              networkInfo: await this.client.NetworkInfo(),
+              hasAudio: this.ingestObject.upload.streams.includes("audio")
+            });
+
             await this.client.MergeMetadata({
               libraryId,
               objectId,
@@ -350,9 +390,19 @@ class IngestStore {
               metadata: {
                 public: {
                   name: `${name} MEZ`,
-                  description: "",
+                  description,
                   asset_metadata: {
-                    display_title: `${name} MEZ`
+                    display_title: `${name} MEZ`,
+                      nft: {
+                        name,
+                        display_name: displayName,
+                        description,
+                        created_at: new Date(),
+                        playable: true,
+                        hasAudio: this.ingestObject.upload.streams.includes("audio"),
+                        embed_url: embedUrl,
+                        external_url: embedUrl
+                      }
                   }
                 }
               }
