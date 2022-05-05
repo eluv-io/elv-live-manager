@@ -252,6 +252,7 @@ const ContentCreation = observer(() => {
               onClick={() => {
                 rootStore.ingestStore.ResetIngestForm();
                 setFiles([]);
+                setImages([]);
               }}
             >
               Back
